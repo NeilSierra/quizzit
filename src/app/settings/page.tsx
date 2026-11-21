@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Download, Trash2, Upload } from "lucide-react";
+import { Cloud, Download, Lock, LogIn, LogOut, Trash2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Modal } from "@/components/ui/Modal";
@@ -10,6 +10,7 @@ import { APP_VERSION, PATCH_NOTES } from "@/lib/changelog";
 import { sound } from "@/lib/sound";
 import { storage } from "@/lib/storage";
 import type { ThemePreference, UiScale } from "@/lib/types";
+import { getUserDisplayName, useAuth } from "@/store/useAuth";
 import { useLibrary } from "@/store/useLibrary";
 
 export default function SettingsPage() {
@@ -22,6 +23,10 @@ export default function SettingsPage() {
   const importBackup = useLibrary((s) => s.importBackup);
   const clearAll = useLibrary((s) => s.clearAll);
   const hydrated = useLibrary((s) => s.hydrated);
+  const user = useAuth((s) => s.user);
+  const syncing = useAuth((s) => s.syncing);
+  const openAuthModal = useAuth((s) => s.openAuthModal);
+  const signOut = useAuth((s) => s.signOut);
 
   const [confirmClear, setConfirmClear] = useState(false);
   const [showAllNotes, setShowAllNotes] = useState(false);
@@ -85,6 +90,44 @@ export default function SettingsPage() {
           {APP_VERSION}
         </span>
       </div>
+
+      {/* Account & Cloud Sync */}
+      <section className="flex flex-col gap-3">
+        <h2 className="text-2xl font-extrabold text-text">
+          Account &amp; Cloud Sync
+        </h2>
+        <Card className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-tint text-brand-text">
+              {user ? <Cloud className="h-6 w-6" /> : <Lock className="h-6 w-6" />}
+            </div>
+            <div>
+              <div className="font-extrabold text-text">
+                {user ? getUserDisplayName(user) : "Guest Mode (Local Only)"}
+              </div>
+              <div className="text-sm font-semibold text-text-muted">
+                {user
+                  ? syncing
+                    ? "Syncing your private library..."
+                    : "Synced to your private Supabase account. No shared library."
+                  : "Sign in to save your quizzes privately across devices."}
+              </div>
+            </div>
+          </div>
+
+          {user ? (
+            <Button variant="secondary" onClick={() => void signOut()}>
+              <LogOut className="h-4 w-4" />
+              Sign Out
+            </Button>
+          ) : (
+            <Button variant="primary" onClick={openAuthModal}>
+              <LogIn className="h-4 w-4" />
+              Sign In
+            </Button>
+          )}
+        </Card>
+      </section>
 
       {/* Appearance & Audio */}
       <section className="flex flex-col gap-3">
@@ -181,7 +224,7 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-1 lg:grid-cols-3 gap-3">
             <Button variant="secondary" fullWidth onClick={handleExportAll}>
               <Download className="h-4 w-4" />
               Export Backup
@@ -235,16 +278,18 @@ export default function SettingsPage() {
         <div className="flex flex-col gap-3">
           {(showAllNotes ? PATCH_NOTES : PATCH_NOTES.slice(0, 3)).map((note) => (
             <Card key={note.version} className="flex flex-col gap-2.5">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="rounded-full bg-brand-tint px-2.5 py-0.5 text-xs font-extrabold text-brand-text">
+              <div className="flex flex-col gap-2.5">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="shrink-0 rounded-full bg-brand-tint px-2.5 py-0.5 text-xs font-extrabold text-brand-text">
                     {note.version}
                   </span>
-                  <h3 className="font-extrabold text-text">{note.title}</h3>
+                  <span className="shrink-0 text-xs font-bold text-text-faint">
+                    {note.date}
+                  </span>
                 </div>
-                <span className="text-xs font-bold text-text-faint">
-                  {note.date}
-                </span>
+                <h3 className="text-base font-extrabold text-text leading-snug">
+                  {note.title}
+                </h3>
               </div>
               <ul className="list-disc pl-5 space-y-1 text-sm font-semibold text-text-muted">
                 {note.changes.map((c, idx) => (

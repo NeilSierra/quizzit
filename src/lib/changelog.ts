@@ -1,4 +1,4 @@
-export const APP_VERSION = "v1.1";
+export const APP_VERSION = "v2.1";
 
 export interface PatchNote {
   version: string;
@@ -9,6 +9,28 @@ export interface PatchNote {
 
 export const PATCH_NOTES: PatchNote[] = [
   {
+    version: "v2.1",
+    date: "2026-11-21",
+    title: "Mobile Hamburger Menu, Likes & Feedback",
+    changes: [
+      "Added an app-wide Like counter and Feedback form (with category and 1–5 star rating) on the Home screen, backed by Supabase.",
+      "Replaced the mobile top-bar action icons with an absolute, floating hamburger menu containing Help & Quiz Guide, Account, Theme, and Patch Notes.",
+      "Updated Account display to show your name instead of your full email address.",
+    ],
+  },
+  {
+    version: "v2.0",
+    date: "2026-11-21",
+    title: "Private Cloud Sync, Google Auth & Help Guide",
+    changes: [
+      "Added Supabase Authentication (Email/Password & Google Sign-In) with strict Row-Level Security—every user's library, attempts, and badges stay 100% private with no shared library.",
+      "Added automatic cloud sync when signed in and a one-time Guest Merge modal to import local quizzes into your account.",
+      "Added a Help & Quiz Guide page (/help) explaining how to use Quizzit, keyboard shortcuts, and CSV/JSON formatting.",
+      "Added question-type icons across setup, import, and quiz play, plus icons and 8-character password validation in the Account modal.",
+      "Improved tablet responsiveness across Settings, Library, Setup, Home, and the AI Prompt Guide, and updated the prompt to ask for plausible, closely related wrong choices.",
+    ],
+  },
+  {
     version: "v1.1",
     date: "2026-11-21",
     title: "CSV-First Prompt, Library Search & Patch Notes",
@@ -16,7 +38,7 @@ export const PATCH_NOTES: PatchNote[] = [
       "Set CSV as the default output format in the AI Prompt Guide.",
       "Updated the AI prompt to request a downloadable .csv or .json file directly from the chatbot.",
       "Added a search bar in the Library to filter quizzes by title or description.",
-      "Added a full-width Patch Notes (v1.1) button at the bottom of the sidebar and a Patch Notes section in Settings (showing 3 releases at a time).",
+      "Added a full-width Patch Notes button at the bottom of the sidebar and a Patch Notes section in Settings (showing 3 releases at a time).",
     ],
   },
   {

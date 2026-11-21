@@ -163,7 +163,7 @@ export default function LibraryPage() {
               </Button>
             </Card>
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
               {filteredQuizSets.map((quiz) => {
             const best = getBestScore(quiz.id);
             const mc = quiz.questions.filter(

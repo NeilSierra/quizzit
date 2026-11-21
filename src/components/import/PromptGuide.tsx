@@ -73,6 +73,11 @@ function buildPrompt(
       ...schemaParts,
       "",
       "Rules:",
+      ...(types.includes("multiple_choice")
+        ? [
+            "- For multiple choice, make wrong choices plausible, closely related to the topic, and similar in length and style to the correct answer (avoid obviously silly or unrelated distractors).",
+          ]
+        : []),
       "- Make the output a downloadable .json file (e.g. quiz.json), or return ONLY valid JSON inside a single code block if file download is not available, with no extra commentary.",
       "- Every question must have a non-empty prompt and a helpful explanation.",
     ].join("\n");
@@ -81,7 +86,7 @@ function buildPrompt(
   const csvNotes: string[] = [];
   if (types.includes("multiple_choice")) {
     csvNotes.push(
-      `- multiple_choice: "choices" is |-separated (2-8 options). "answer" is 1-based index (e.g. 2 or 1|3 for multi-select).`
+      `- multiple_choice: "choices" is |-separated (2-8 options). "answer" is 1-based index (e.g. 2 or 1|3 for multi-select). Make wrong choices plausible, closely related to the topic, and similar in length/style to the correct answer.`
     );
   }
   if (types.includes("identification")) {
@@ -168,7 +173,7 @@ export function PromptGuide() {
 
       {/* Controls */}
       <div className="flex flex-col gap-4">
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
           <div className="flex flex-col gap-1.5">
             <span className="text-xs font-extrabold uppercase tracking-wider text-text-muted">
               Output Format
@@ -248,7 +253,7 @@ export function PromptGuide() {
           <span className="text-xs font-extrabold uppercase tracking-wider text-text-muted">
             Question Types
           </span>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-1 lg:grid-cols-3 gap-2">
             {TYPE_OPTIONS.map((opt) => {
               const active = types.includes(opt.id);
               return (

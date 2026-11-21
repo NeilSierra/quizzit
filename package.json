@@ -1,6 +1,6 @@
 {
   "name": "quizzit",
-  "version": "1.1.0",
+  "version": "2.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -10,6 +10,8 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.119.2",
     "canvas-confetti": "^1.9.4",
     "framer-motion": "^14.14.0",
     "lucide-react": "^1.77.0",

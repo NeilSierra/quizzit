@@ -3,6 +3,7 @@ import { convertQuestionsToMode } from "../convert";
 import { isTypoMatch, normalize } from "../normalize";
 import { CSV_TEMPLATE, parseCsvImport } from "../parsers/csv";
 import { JSON_TEMPLATE, parseJsonImport } from "../parsers/json";
+import { computeGuestMergeDiff } from "../supabase/sync";
 import {
   gradeQuestion,
   scoreEnumeration,
@@ -135,5 +136,27 @@ describe("convertQuestionsToMode", () => {
       expect(convertedId.choices.length).toBeGreaterThanOrEqual(2);
       expect(convertedId.choices[convertedId.answer[0]]).toBe("Photosynthesis");
     }
+  });
+});
+
+describe("computeGuestMergeDiff", () => {
+  it("deduplicates existing cloud IDs and unions badges", () => {
+    const sample = parseJsonImport(JSON_TEMPLATE).validQuestions;
+    const diff = computeGuestMergeDiff(
+      [{ id: "q1", title: "Cloud", createdAt: 1, questions: sample }],
+      [],
+      ["first_quiz"],
+      [
+        { id: "q1", title: "Local Dup", createdAt: 1, questions: sample },
+        { id: "q2", title: "Local New", createdAt: 2, questions: sample },
+      ],
+      [],
+      ["first_quiz", "perfect_score"]
+    );
+
+    expect(diff.setsToInsert).toHaveLength(1);
+    expect(diff.setsToInsert[0].id).toBe("q2");
+    expect(diff.mergedSets).toHaveLength(2);
+    expect(diff.mergedBadges).toEqual(["first_quiz", "perfect_score"]);
   });
 });

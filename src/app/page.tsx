@@ -11,6 +11,7 @@ import {
   Sparkles,
   Upload,
 } from "lucide-react";
+import { FeedbackSection } from "@/components/FeedbackSection";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { useLibrary } from "@/store/useLibrary";
@@ -120,7 +121,7 @@ export default function HomePage() {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-3 gap-2 sm:gap-4">
-        <Card className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-2 sm:gap-3 p-3 sm:p-5">
+        <Card className="flex flex-col sm:flex-row md:flex-col lg:flex-row items-center text-center sm:text-left md:text-center lg:text-left gap-2 sm:gap-3 p-3 sm:p-5">
           <div className="flex h-9 w-9 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl bg-brand-tint text-brand-text">
             <BookOpen className="h-5 w-5 sm:h-6 sm:w-6" />
           </div>
@@ -134,7 +135,7 @@ export default function HomePage() {
           </div>
         </Card>
 
-        <Card className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-2 sm:gap-3 p-3 sm:p-5">
+        <Card className="flex flex-col sm:flex-row md:flex-col lg:flex-row items-center text-center sm:text-left md:text-center lg:text-left gap-2 sm:gap-3 p-3 sm:p-5">
           <div className="flex h-9 w-9 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl bg-brand-tint text-success">
             <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6" />
           </div>
@@ -148,7 +149,7 @@ export default function HomePage() {
           </div>
         </Card>
 
-        <Card className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-2 sm:gap-3 p-3 sm:p-5">
+        <Card className="flex flex-col sm:flex-row md:flex-col lg:flex-row items-center text-center sm:text-left md:text-center lg:text-left gap-2 sm:gap-3 p-3 sm:p-5">
           <div className="flex h-9 w-9 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl bg-brand-tint text-xp">
             <Award className="h-5 w-5 sm:h-6 sm:w-6" />
           </div>
@@ -201,6 +202,8 @@ export default function HomePage() {
           </div>
         </section>
       )}
+
+      <FeedbackSection />
     </div>
   );
 }

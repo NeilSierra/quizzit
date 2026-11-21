@@ -3,21 +3,30 @@
 import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MotionConfig } from "framer-motion";
+import { AnimatePresence, motion, MotionConfig } from "framer-motion";
 import {
   BookOpen,
+  HelpCircle,
   History,
   Home,
+  Menu,
   Moon,
   PanelLeftClose,
   PanelLeftOpen,
   Settings,
   Sun,
   Upload,
+  UserCheck,
+  UserCircle,
+  X,
 } from "lucide-react";
+import { AuthModal } from "@/components/auth/AuthModal";
+import { GuestMergeModal } from "@/components/auth/GuestMergeModal";
+import { Card } from "@/components/ui/Card";
 import { Modal } from "@/components/ui/Modal";
 import { APP_VERSION, PATCH_NOTES } from "@/lib/changelog";
 import { sound } from "@/lib/sound";
+import { getUserDisplayName, useAuth } from "@/store/useAuth";
 import { useLibrary } from "@/store/useLibrary";
 import { useQuizSession } from "@/store/useQuizSession";
 
@@ -35,11 +44,20 @@ export function AppShell({ children }: { children: ReactNode }) {
   const theme = useLibrary((s) => s.theme);
   const setTheme = useLibrary((s) => s.setTheme);
   const checkSavedSession = useQuizSession((s) => s.checkSavedSession);
+  const initAuth = useAuth((s) => s.initAuth);
+  const user = useAuth((s) => s.user);
+  const openAuthModal = useAuth((s) => s.openAuthModal);
   const [collapsed, setCollapsed] = useState(false);
   const [showPatchNotes, setShowPatchNotes] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     hydrate();
+    initAuth();
     checkSavedSession();
     try {
       if (localStorage.getItem("quizapp:sidebar-collapsed") === "true") {
@@ -76,7 +94,9 @@ export function AppShell({ children }: { children: ReactNode }) {
     return (
       <MotionConfig reducedMotion="user">
         <main className="min-h-screen bg-bg">{children}</main>
-      </MotionConfig>
+        <AuthModal />
+      <GuestMergeModal />
+    </MotionConfig>
     );
   }
 
@@ -155,10 +175,55 @@ export function AppShell({ children }: { children: ReactNode }) {
               </Link>
             );
           })}
+          <Link
+            href="/help"
+            onClick={() => sound.playClick()}
+            title="Help & Quiz Guide"
+            className={`focus-ring flex min-h-[52px] items-center rounded-2xl border-2 font-extrabold text-sm uppercase tracking-wider transition-colors ${
+              collapsed ? "justify-center px-0" : "gap-3 px-4"
+            } ${
+              pathname.startsWith("/help")
+                ? "border-brand-fill bg-brand-tint text-brand-text"
+                : "border-transparent text-text-muted hover:bg-surface hover:text-text"
+            }`}
+          >
+            <HelpCircle className="h-5 w-5 shrink-0" strokeWidth={2.25} />
+            {!collapsed && <span>Help</span>}
+          </Link>
         </nav>
 
         {/* Theme Footer */}
         <div className="mt-auto flex w-full flex-col gap-2 pt-4 border-t-2 border-border">
+          <button
+            type="button"
+            onClick={() => {
+              sound.playClick();
+              openAuthModal();
+            }}
+            title={user ? getUserDisplayName(user) : "Sign in to sync"}
+            className={`focus-ring flex min-h-11 w-full items-center rounded-xl border-2 border-border bg-surface text-sm font-bold text-text-muted hover:border-border-strong hover:text-text ${
+              collapsed ? "justify-center px-0" : "justify-between px-3"
+            }`}
+          >
+            <span className="flex items-center gap-2 min-w-0">
+              {user ? (
+                <UserCheck className="h-4 w-4 shrink-0 text-success" />
+              ) : (
+                <UserCircle className="h-4 w-4 shrink-0" />
+              )}
+              {!collapsed && (
+                <span className="truncate">
+                  {user ? getUserDisplayName(user) : "Account"}
+                </span>
+              )}
+            </span>
+            {!collapsed && !user && (
+              <span className="uppercase text-xs font-extrabold text-brand-text shrink-0">
+                Sign In
+              </span>
+            )}
+          </button>
+
           <button
             type="button"
             onClick={cycleTheme}
@@ -203,43 +268,132 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       {/* Mobile Top Bar */}
-      <header className="flex md:hidden items-center justify-between border-b-2 border-border bg-surface px-4 py-3 sticky top-0 z-30">
-        <div className="flex items-center gap-2">
-          <Link href="/" className="flex items-center gap-2.5">
+      <header className="md:hidden border-b-2 border-border bg-surface sticky top-0 z-30">
+        <div className="flex items-center justify-between px-4 py-3">
+          <Link
+            href="/"
+            onClick={() => sound.playClick()}
+            className="flex items-center gap-2.5"
+          >
             <img
               src="/mascot/logo.png"
               alt="Quizzit mascot"
               className="h-9 w-9 shrink-0 object-contain"
             />
-            <span className="text-xl font-extrabold text-brand-text">Quizzit</span>
+            <span className="text-xl font-extrabold text-brand-text">
+              Quizzit
+            </span>
           </Link>
+
           <button
             type="button"
             onClick={() => {
               sound.playClick();
-              setShowPatchNotes(true);
+              setMobileMenuOpen((v) => !v);
             }}
-            title="View patch notes"
-            className="focus-ring rounded-full border border-border bg-bg-subtle px-2 py-0.5 text-[11px] font-extrabold text-text-muted"
+            aria-expanded={mobileMenuOpen}
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            className="focus-ring flex h-11 w-11 items-center justify-center rounded-xl border-2 border-border bg-bg-subtle text-text hover:border-border-strong"
           >
-            {APP_VERSION}
-          </button>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={cycleTheme}
-            aria-label={`Theme: ${theme}`}
-            className="focus-ring flex h-11 w-11 items-center justify-center rounded-xl border-2 border-border bg-bg-subtle text-text-muted"
-          >
-            {theme === "dark" ? (
-              <Moon className="h-4 w-4" />
+            {mobileMenuOpen ? (
+              <X className="h-5 w-5" />
             ) : (
-              <Sun className="h-4 w-4" />
+              <Menu className="h-5 w-5" />
             )}
           </button>
         </div>
+
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <>
+              <div
+                className="fixed inset-0 z-30"
+                aria-hidden="true"
+                onClick={() => setMobileMenuOpen(false)}
+              />
+              <motion.div
+                initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                transition={{ duration: 0.14, ease: "easeOut" }}
+                className="absolute right-4 top-full mt-2 z-40 w-64 rounded-2xl border-2 border-border bg-surface-raised p-2 shadow-xl"
+              >
+                <div className="flex flex-col gap-1.5">
+                <Link
+                  href="/help"
+                  onClick={() => {
+                    sound.playClick();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="focus-ring flex min-h-12 items-center gap-3 rounded-xl border-2 border-border bg-surface px-3.5 text-sm font-extrabold text-text"
+                >
+                  <HelpCircle className="h-5 w-5 text-brand-text shrink-0" />
+                  <span>Help &amp; Quiz Guide</span>
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    sound.playClick();
+                    setMobileMenuOpen(false);
+                    openAuthModal();
+                  }}
+                  className="focus-ring flex min-h-12 w-full items-center justify-between rounded-xl border-2 border-border bg-surface px-3.5 text-sm font-extrabold text-text"
+                >
+                  <span className="flex items-center gap-3 min-w-0">
+                    {user ? (
+                      <UserCheck className="h-5 w-5 shrink-0 text-success" />
+                    ) : (
+                      <UserCircle className="h-5 w-5 shrink-0 text-brand-text" />
+                    )}
+                    <span className="truncate">
+                      {user ? getUserDisplayName(user) : "Account"}
+                    </span>
+                  </span>
+                  {!user && (
+                    <span className="uppercase text-xs font-extrabold text-brand-text">
+                      Sign In
+                    </span>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={cycleTheme}
+                  className="focus-ring flex min-h-12 w-full items-center justify-between rounded-xl border-2 border-border bg-surface px-3.5 text-sm font-extrabold text-text"
+                >
+                  <span className="flex items-center gap-3">
+                    {theme === "dark" ? (
+                      <Moon className="h-5 w-5 text-brand-text shrink-0" />
+                    ) : (
+                      <Sun className="h-5 w-5 text-brand-text shrink-0" />
+                    )}
+                    <span>Theme</span>
+                  </span>
+                  <span className="uppercase text-xs font-extrabold text-brand-text">
+                    {theme}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    sound.playClick();
+                    setMobileMenuOpen(false);
+                    setShowPatchNotes(true);
+                  }}
+                  className="focus-ring flex min-h-12 w-full items-center justify-between rounded-xl border-2 border-border bg-surface px-3.5 text-sm font-extrabold text-text"
+                >
+                  <span>Patch Notes</span>
+                  <span className="uppercase text-xs font-extrabold text-brand-text">
+                    {APP_VERSION}
+                  </span>
+                </button>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </header>
 
       {/* Main Content */}
@@ -279,31 +433,33 @@ export function AppShell({ children }: { children: ReactNode }) {
         onClose={() => setShowPatchNotes(false)}
         title={`Patch Notes (${APP_VERSION})`}
       >
-        <div className="max-h-80 overflow-y-auto space-y-5 pr-1">
+        <div className="max-h-96 overflow-y-auto flex flex-col gap-3 pr-1 pb-1">
           {PATCH_NOTES.map((note) => (
-            <div key={note.version} className="space-y-2">
-              <div className="flex flex-wrap items-start justify-between gap-2">
-                <div className="flex items-center gap-2 min-w-0">
+            <Card key={note.version} className="flex flex-col gap-2.5">
+              <div className="flex flex-col gap-2.5">
+                <div className="flex items-center justify-between gap-2">
                   <span className="shrink-0 rounded-full bg-brand-tint px-2.5 py-0.5 text-xs font-extrabold text-brand-text">
                     {note.version}
                   </span>
-                  <h3 className="text-sm font-extrabold text-text leading-snug">
-                    {note.title}
-                  </h3>
+                  <span className="shrink-0 text-xs font-bold text-text-faint">
+                    {note.date}
+                  </span>
                 </div>
-                <span className="shrink-0 text-xs font-bold text-text-faint">
-                  {note.date}
-                </span>
+                <h3 className="text-base font-extrabold text-text leading-snug">
+                  {note.title}
+                </h3>
               </div>
               <ul className="list-disc pl-5 space-y-1 text-sm font-semibold text-text-muted">
                 {note.changes.map((c, idx) => (
                   <li key={idx}>{c}</li>
                 ))}
               </ul>
-            </div>
+            </Card>
           ))}
         </div>
       </Modal>
+      <AuthModal />
+      <GuestMergeModal />
     </MotionConfig>
   );
 }

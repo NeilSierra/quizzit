@@ -5,6 +5,15 @@ import { ALL_BADGES, evaluateAttemptProgress } from "@/lib/badges";
 import { parseJsonImport, SAMPLE_QUIZ_JSON } from "@/lib/parsers/json";
 import { questionSchema } from "@/lib/schema";
 import { storage } from "@/lib/storage";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import {
+  clearRemoteUserData,
+  deleteQuizSetRemote,
+  insertAttemptRemote,
+  updateQuizTitleRemote,
+  upsertQuizSet,
+  upsertUnlockedBadgesRemote,
+} from "@/lib/supabase/sync";
 import type {
   Badge,
   BadgeId,
@@ -15,6 +24,7 @@ import type {
   UiScale,
   UserStats,
 } from "@/lib/types";
+import { useAuth } from "./useAuth";
 
 export interface BackupImportResult {
   ok: boolean;
@@ -46,6 +56,12 @@ interface LibraryState {
   setTheme: (theme: ThemePreference) => void;
   setSoundEnabled: (enabled: boolean) => void;
   setUiScale: (scale: UiScale) => void;
+  setCloudData: (
+    quizSets: QuizSet[],
+    attempts: QuizAttempt[],
+    stats: UserStats
+  ) => void;
+  resetToLocalGuest: () => void;
   clearAll: () => void;
 }
 
@@ -112,7 +128,13 @@ export const useLibrary = create<LibraryState>((set, get) => ({
       questions,
     };
     const next = [newSet, ...get().quizSets];
-    storage.saveLibrary(next);
+    const user = useAuth.getState().user;
+    const supabase = createSupabaseBrowserClient();
+    if (user && supabase) {
+      void upsertQuizSet(supabase, user.id, newSet);
+    } else {
+      storage.saveLibrary(next);
+    }
     set({ quizSets: next });
     return newSet;
   },
@@ -123,13 +145,25 @@ export const useLibrary = create<LibraryState>((set, get) => ({
     const next = get().quizSets.map((q) =>
       q.id === id ? { ...q, title: trimmed } : q
     );
-    storage.saveLibrary(next);
+    const user = useAuth.getState().user;
+    const supabase = createSupabaseBrowserClient();
+    if (user && supabase) {
+      void updateQuizTitleRemote(supabase, user.id, id, trimmed);
+    } else {
+      storage.saveLibrary(next);
+    }
     set({ quizSets: next });
   },
 
   deleteQuizSet: (id) => {
     const next = get().quizSets.filter((q) => q.id !== id);
-    storage.saveLibrary(next);
+    const user = useAuth.getState().user;
+    const supabase = createSupabaseBrowserClient();
+    if (user && supabase) {
+      void deleteQuizSetRemote(supabase, user.id, id);
+    } else {
+      storage.saveLibrary(next);
+    }
     set({ quizSets: next });
   },
 
@@ -259,9 +293,27 @@ export const useLibrary = create<LibraryState>((set, get) => ({
       unlockedBadges: Array.from(existingBadges),
     };
 
-    storage.saveLibrary(mergedLibrary);
-    storage.saveAttempts(mergedAttempts);
-    storage.saveStats(mergedStats);
+    const user = useAuth.getState().user;
+    const supabase = createSupabaseBrowserClient();
+    if (user && supabase) {
+      for (const s of newSets) {
+        void upsertQuizSet(supabase, user.id, s);
+      }
+      for (const a of newAttempts) {
+        void insertAttemptRemote(supabase, user.id, a);
+      }
+      if (addedBadges > 0) {
+        void upsertUnlockedBadgesRemote(
+          supabase,
+          user.id,
+          mergedStats.unlockedBadges
+        );
+      }
+    } else {
+      storage.saveLibrary(mergedLibrary);
+      storage.saveAttempts(mergedAttempts);
+      storage.saveStats(mergedStats);
+    }
     set({
       quizSets: mergedLibrary,
       attempts: mergedAttempts,
@@ -294,8 +346,21 @@ export const useLibrary = create<LibraryState>((set, get) => ({
     );
 
     const nextAttempts = [attempt, ...get().attempts];
-    storage.saveAttempts(nextAttempts);
-    storage.saveStats(nextStats);
+    const user = useAuth.getState().user;
+    const supabase = createSupabaseBrowserClient();
+    if (user && supabase) {
+      void insertAttemptRemote(supabase, user.id, attempt);
+      if (newlyUnlocked.length > 0) {
+        void upsertUnlockedBadgesRemote(
+          supabase,
+          user.id,
+          nextStats.unlockedBadges
+        );
+      }
+    } else {
+      storage.saveAttempts(nextAttempts);
+      storage.saveStats(nextStats);
+    }
     set({ attempts: nextAttempts, stats: nextStats });
 
     return { newlyUnlocked, previousBest, previousLatest };
@@ -318,8 +383,26 @@ export const useLibrary = create<LibraryState>((set, get) => ({
     set({ uiScale: scale });
   },
 
+  setCloudData: (quizSets, attempts, stats) => {
+    set({ quizSets, attempts, stats });
+  },
+
+  resetToLocalGuest: () => {
+    set({
+      quizSets: storage.getLibrary(),
+      attempts: storage.getAttempts(),
+      stats: storage.getStats(),
+    });
+  },
+
   clearAll: () => {
-    storage.clearAllData();
+    const user = useAuth.getState().user;
+    const supabase = createSupabaseBrowserClient();
+    if (user && supabase) {
+      void clearRemoteUserData(supabase, user.id);
+    } else {
+      storage.clearAllData();
+    }
     set({
       quizSets: [],
       attempts: [],
