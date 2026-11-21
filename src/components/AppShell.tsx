@@ -18,6 +18,7 @@ import {
   Upload,
   UserCheck,
   UserCircle,
+  WifiOff,
   X,
 } from "lucide-react";
 import { AuthModal } from "@/components/auth/AuthModal";
@@ -50,10 +51,23 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
   const [showPatchNotes, setShowPatchNotes] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isOffline, setIsOffline] = useState(false);
 
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const syncOnline = () => setIsOffline(!navigator.onLine);
+    syncOnline();
+    window.addEventListener("online", syncOnline);
+    window.addEventListener("offline", syncOnline);
+    return () => {
+      window.removeEventListener("online", syncOnline);
+      window.removeEventListener("offline", syncOnline);
+    };
+  }, []);
 
   useEffect(() => {
     hydrate();
@@ -401,7 +415,21 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* Main Content */}
       <main className="flex-1 min-w-0 pb-24 md:pb-12 px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <div className="mx-auto max-w-[860px]">{children}</div>
+        <div className="mx-auto max-w-[860px]">
+          {isOffline && (
+            <div
+              role="status"
+              className="mb-4 flex items-center gap-2.5 rounded-2xl border-2 border-warning/50 bg-warning/10 px-4 py-2.5 text-xs sm:text-sm font-extrabold text-warning"
+            >
+              <WifiOff className="h-4 w-4 shrink-0" />
+              <span>
+                Offline mode &mdash; your cached quizzes and progress are still
+                available locally.
+              </span>
+            </div>
+          )}
+          {children}
+        </div>
       </main>
 
       {/* Mobile Bottom Tab Bar */}

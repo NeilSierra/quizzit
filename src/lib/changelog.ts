@@ -1,4 +1,4 @@
-export const APP_VERSION = "v3.0";
+export const APP_VERSION = "v3.1";
 
 export interface PatchNote {
   version: string;
@@ -8,6 +8,16 @@ export interface PatchNote {
 }
 
 export const PATCH_NOTES: PatchNote[] = [
+  {
+    version: "v3.1",
+    date: "2026-11-22",
+    title: "Offline Mode for PWA",
+    changes: [
+      "Upgraded the service worker to precache all core pages, RSC payloads, and mascot assets for offline navigation.",
+      "Added automatic local mirror caching so signed-in users can access and play their library even without an internet connection.",
+      "Added an Offline Mode status banner when the device disconnects.",
+    ],
+  },
   {
     version: "v3.0",
     date: "2026-11-22",
