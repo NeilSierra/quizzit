@@ -23,6 +23,7 @@ export default function QuizSetupPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const quizSets = useLibrary((s) => s.quizSets);
+  const attempts = useLibrary((s) => s.attempts);
   const hydrated = useLibrary((s) => s.hydrated);
   const startSession = useQuizSession((s) => s.startSession);
 
@@ -64,6 +65,25 @@ export default function QuizSetupPage() {
   const [useTimer, setUseTimer] = useState(false);
   const [timerMinutes, setTimerMinutes] = useState(10);
   const [typoTolerance, setTypoTolerance] = useState(true);
+  const [unquizzedOnly, setUnquizzedOnly] = useState(false);
+
+  const unquizzedQuestions = useMemo(() => {
+    if (!quizSet) return [];
+    const quizzedIds = new Set<string>();
+    for (const att of attempts) {
+      if (att.quizSetId === quizSet.id) {
+        for (const ans of att.answers) {
+          quizzedIds.add(ans.questionId);
+        }
+      }
+    }
+    return quizSet.questions.filter((q) => !quizzedIds.has(q.id));
+  }, [quizSet, attempts]);
+
+  const hasPriorAttempts = useMemo(
+    () => Boolean(quizSet && attempts.some((a) => a.quizSetId === quizSet.id)),
+    [quizSet, attempts]
+  );
 
   if (!hydrated) {
     return (
@@ -88,10 +108,14 @@ export default function QuizSetupPage() {
   }
 
   const activeTypes = selectedTypes ?? availableTypes;
+  const sourcePool =
+    unquizzedOnly && unquizzedQuestions.length > 0
+      ? unquizzedQuestions
+      : quizSet.questions;
   const matchingCount =
     targetMode === "original"
-      ? quizSet.questions.filter((q) => activeTypes.includes(q.type)).length
-      : quizSet.questions.length;
+      ? sourcePool.filter((q) => activeTypes.includes(q.type)).length
+      : sourcePool.length;
 
   const toggleType = (type: QuestionType) => {
     if (typeCounts[type] === 0) return;
@@ -120,7 +144,7 @@ export default function QuizSetupPage() {
       typoTolerance,
     };
     sound.playStart();
-    startSession(quizSet, settings);
+    startSession({ ...quizSet, questions: sourcePool }, settings);
     router.push(`/quiz/${quizSet.id}/play`);
   };
 
@@ -335,6 +359,19 @@ export default function QuizSetupPage() {
         </div>
 
         <div className="divide-y-2 divide-border">
+          {hasPriorAttempts && (
+            <Toggle
+              checked={unquizzedOnly && unquizzedQuestions.length > 0}
+              onChange={setUnquizzedOnly}
+              label="Continue unquizzed questions only"
+              description={
+                unquizzedQuestions.length > 0
+                  ? `${unquizzedQuestions.length} of ${quizSet.questions.length} not yet quizzed`
+                  : "All questions in this set have been quizzed"
+              }
+              disabled={unquizzedQuestions.length === 0}
+            />
+          )}
           <Toggle
             checked={shuffleQuestions}
             onChange={setShuffleQuestions}

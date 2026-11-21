@@ -1,4 +1,4 @@
-export const APP_VERSION = "v2.2";
+export const APP_VERSION = "v2.3";
 
 export interface PatchNote {
   version: string;
@@ -8,6 +8,15 @@ export interface PatchNote {
 }
 
 export const PATCH_NOTES: PatchNote[] = [
+  {
+    version: "v2.3",
+    date: "2026-11-22",
+    title: "Continue Unquizzed Questions",
+    changes: [
+      "Added a 'Continue unquizzed questions only' toggle in Quiz Setup when a quiz has remaining unquizzed items.",
+      "Added a 'Continue Unquizzed Questions' button on the Results screen to jump straight into the remaining questions.",
+    ],
+  },
   {
     version: "v2.2",
     date: "2026-11-21",

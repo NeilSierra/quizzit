@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   Clock,
   Flame,
+  Play,
   RefreshCw,
   RotateCcw,
   TrendingUp,
@@ -19,6 +20,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { sound } from "@/lib/sound";
 import type { QuestionType } from "@/lib/types";
+import { useLibrary } from "@/store/useLibrary";
 import { useQuizSession } from "@/store/useQuizSession";
 
 function getTierCopy(score: number): { title: string; subtitle: string; emoji: string } {
@@ -69,7 +71,10 @@ export default function ResultsPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const lastCompleted = useQuizSession((s) => s.lastCompleted);
+  const startSession = useQuizSession((s) => s.startSession);
   const startRetryWrong = useQuizSession((s) => s.startRetryWrong);
+  const quizSets = useLibrary((s) => s.quizSets);
+  const attempts = useLibrary((s) => s.attempts);
 
   useEffect(() => {
     if (!lastCompleted) return;
@@ -139,6 +144,30 @@ export default function ResultsPage() {
   const isNewBest = previousBest !== null && attempt.accuracy > previousBest;
   const delta =
     previousLatest !== null ? attempt.accuracy - previousLatest : null;
+
+  const fullQuizSet = quizSets.find((s) => s.id === attempt.quizSetId);
+  const unquizzedQuestions = (() => {
+    if (!fullQuizSet) return [];
+    const quizzedIds = new Set<string>();
+    for (const att of attempts) {
+      if (att.quizSetId === attempt.quizSetId) {
+        for (const ans of att.answers) {
+          quizzedIds.add(ans.questionId);
+        }
+      }
+    }
+    return fullQuizSet.questions.filter((q) => !quizzedIds.has(q.id));
+  })();
+
+  const handleContinueUnquizzed = () => {
+    if (!fullQuizSet || unquizzedQuestions.length === 0) return;
+    sound.playStart();
+    startSession(
+      { ...fullQuizSet, questions: unquizzedQuestions },
+      attempt.settings
+    );
+    router.push(`/quiz/${id}/play`);
+  };
 
   const handleRetryWrong = () => {
     if (wrongQuestions.length === 0) return;
@@ -286,8 +315,23 @@ export default function ResultsPage() {
 
       {/* Next Actions */}
       <div className="flex flex-col gap-3">
+        {unquizzedQuestions.length > 0 && (
+          <Button
+            variant="primary"
+            fullWidth
+            silent
+            onClick={handleContinueUnquizzed}
+          >
+            <Play className="h-4 w-4 fill-current" />
+            Continue Unquizzed Questions ({unquizzedQuestions.length} left)
+          </Button>
+        )}
+
         <Link href={`/quiz/${id}/review`}>
-          <Button variant="primary" fullWidth>
+          <Button
+            variant={unquizzedQuestions.length > 0 ? "secondary" : "primary"}
+            fullWidth
+          >
             Review Answers
           </Button>
         </Link>
