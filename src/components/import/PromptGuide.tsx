@@ -123,7 +123,7 @@ export function PromptGuide() {
     "identification",
     "enumeration",
   ]);
-  const [countMode, setCountMode] = useState<"max" | "custom">("custom");
+  const [countMode, setCountMode] = useState<"max" | "custom">("max");
   const [count, setCount] = useState(15);
   const [notes, setNotes] = useState("");
   const [copied, setCopied] = useState(false);

@@ -1,4 +1,4 @@
-export const APP_VERSION = "v2.1";
+export const APP_VERSION = "v2.2";
 
 export interface PatchNote {
   version: string;
@@ -8,6 +8,15 @@ export interface PatchNote {
 }
 
 export const PATCH_NOTES: PatchNote[] = [
+  {
+    version: "v2.2",
+    date: "2026-11-21",
+    title: "Max Questions Default & Feedback Polish",
+    changes: [
+      "Set Number of Questions in the AI Prompt Guide to Max by default.",
+      "Added Idea, Bug, and Love it icons to the Feedback modal categories and defaulted star rating to 0.",
+    ],
+  },
   {
     version: "v2.1",
     date: "2026-11-21",

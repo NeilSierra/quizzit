@@ -29,7 +29,7 @@ create table if not exists public.user_feedback (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references auth.users(id) on delete set null,
   category text not null default 'idea',
-  rating integer not null default 5 check (rating >= 1 and rating <= 5),
+  rating integer not null default 0 check (rating >= 0 and rating <= 5),
   message text not null,
   created_at timestamptz not null default now()
 );

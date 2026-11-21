@@ -2,7 +2,15 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, Heart, MessageSquare, Send, Star } from "lucide-react";
+import {
+  Bug,
+  CheckCircle2,
+  Heart,
+  Lightbulb,
+  MessageSquare,
+  Send,
+  Star,
+} from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Modal } from "@/components/ui/Modal";
@@ -34,7 +42,7 @@ export function FeedbackSection() {
 
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [category, setCategory] = useState<"idea" | "bug" | "praise">("idea");
-  const [rating, setRating] = useState(5);
+  const [rating, setRating] = useState(0);
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -160,6 +168,7 @@ export function FeedbackSection() {
             onClick={() => {
               setSubmitted(false);
               setError(null);
+              setRating(0);
               setFeedbackOpen(true);
             }}
           >
@@ -202,25 +211,26 @@ export function FeedbackSection() {
               <div className="grid grid-cols-3 gap-2">
                 {(
                   [
-                    { id: "idea", label: "Idea" },
-                    { id: "bug", label: "Bug" },
-                    { id: "praise", label: "Love it" },
+                    { id: "idea", label: "Idea", icon: Lightbulb },
+                    { id: "bug", label: "Bug", icon: Bug },
+                    { id: "praise", label: "Love it", icon: Heart },
                   ] as const
-                ).map((item) => (
+                ).map(({ id, label, icon: Icon }) => (
                   <button
-                    key={item.id}
+                    key={id}
                     type="button"
                     onClick={() => {
                       sound.playClick();
-                      setCategory(item.id);
+                      setCategory(id);
                     }}
-                    className={`focus-ring rounded-xl border-2 py-2 text-xs font-extrabold uppercase ${
-                      category === item.id
+                    className={`focus-ring flex items-center justify-center gap-1.5 rounded-xl border-2 py-2 text-xs font-extrabold uppercase ${
+                      category === id
                         ? "border-brand-fill bg-brand-tint text-brand-text"
                         : "border-border bg-surface text-text-muted"
                     }`}
                   >
-                    {item.label}
+                    <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                    <span>{label}</span>
                   </button>
                 ))}
               </div>
