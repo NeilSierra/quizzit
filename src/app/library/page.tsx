@@ -1,20 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import {
   BookOpen,
   Download,
   Pencil,
   Play,
+  Search,
   Sparkles,
   Trash2,
   Upload,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
+import { sound } from "@/lib/sound";
 import type { QuizSet } from "@/lib/types";
 import { useLibrary } from "@/store/useLibrary";
 
@@ -26,9 +29,20 @@ export default function LibraryPage() {
   const deleteQuizSet = useLibrary((s) => s.deleteQuizSet);
   const importSampleQuiz = useLibrary((s) => s.importSampleQuiz);
 
+  const [search, setSearch] = useState("");
   const [renaming, setRenaming] = useState<QuizSet | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const [deleting, setDeleting] = useState<QuizSet | null>(null);
+
+  const filteredQuizSets = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return quizSets;
+    return quizSets.filter(
+      (quiz) =>
+        quiz.title.toLowerCase().includes(q) ||
+        (quiz.description && quiz.description.toLowerCase().includes(q))
+    );
+  }, [quizSets, search]);
 
   const getBestScore = (quizId: string) => {
     const matching = attempts.filter((a) => a.quizSetId === quizId);
@@ -110,8 +124,47 @@ export default function LibraryPage() {
           </div>
         </Card>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {quizSets.map((quiz) => {
+        <>
+          <div className="relative">
+            <Search
+              className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-text-muted"
+              aria-hidden="true"
+            />
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search quizzes by title or description..."
+              aria-label="Search quizzes"
+              className="h-12 w-full rounded-2xl border-2 border-border bg-surface pl-11 pr-11 text-base font-semibold text-text placeholder:text-text-faint transition-colors focus:border-brand-fill focus:outline-none"
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => {
+                  sound.playClick();
+                  setSearch("");
+                }}
+                aria-label="Clear search"
+                className="focus-ring absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-xl text-text-muted hover:bg-bg-subtle hover:text-text"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+
+          {filteredQuizSets.length === 0 ? (
+            <Card className="py-10 text-center flex flex-col items-center gap-3">
+              <p className="text-lg font-extrabold text-text">
+                No quizzes match &ldquo;{search}&rdquo;
+              </p>
+              <Button variant="secondary" onClick={() => setSearch("")}>
+                Clear Search
+              </Button>
+            </Card>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {filteredQuizSets.map((quiz) => {
             const best = getBestScore(quiz.id);
             const mc = quiz.questions.filter(
               (q) => q.type === "multiple_choice"
@@ -204,7 +257,9 @@ export default function LibraryPage() {
               </Card>
             );
           })}
-        </div>
+            </div>
+          )}
+        </>
       )}
 
       {/* Rename Modal */}

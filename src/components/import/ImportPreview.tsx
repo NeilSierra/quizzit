@@ -5,6 +5,7 @@ import { AlertTriangle, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import { QuestionTypeIcon } from "@/components/QuestionTypeIcon";
 import type { ImportResult } from "@/lib/types";
 
 interface ImportPreviewProps {
@@ -50,13 +51,16 @@ export function ImportPreview({
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <span className="rounded-lg border-2 border-border bg-bg-subtle px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-text">
+          <span className="inline-flex items-center gap-1.5 rounded-lg border-2 border-border bg-bg-subtle px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-text">
+            <QuestionTypeIcon type="multiple_choice" className="h-3.5 w-3.5" />
             Multiple Choice: {mcCount}
           </span>
-          <span className="rounded-lg border-2 border-border bg-bg-subtle px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-text">
+          <span className="inline-flex items-center gap-1.5 rounded-lg border-2 border-border bg-bg-subtle px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-text">
+            <QuestionTypeIcon type="identification" className="h-3.5 w-3.5" />
             Identification: {idCount}
           </span>
-          <span className="rounded-lg border-2 border-border bg-bg-subtle px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-text">
+          <span className="inline-flex items-center gap-1.5 rounded-lg border-2 border-border bg-bg-subtle px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-text">
+            <QuestionTypeIcon type="enumeration" className="h-3.5 w-3.5" />
             Enumeration: {enumCount}
           </span>
         </div>

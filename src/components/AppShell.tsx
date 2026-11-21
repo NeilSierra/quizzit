@@ -15,6 +15,8 @@ import {
   Sun,
   Upload,
 } from "lucide-react";
+import { Modal } from "@/components/ui/Modal";
+import { APP_VERSION, PATCH_NOTES } from "@/lib/changelog";
 import { sound } from "@/lib/sound";
 import { useLibrary } from "@/store/useLibrary";
 import { useQuizSession } from "@/store/useQuizSession";
@@ -34,6 +36,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const setTheme = useLibrary((s) => s.setTheme);
   const checkSavedSession = useQuizSession((s) => s.checkSavedSession);
   const [collapsed, setCollapsed] = useState(false);
+  const [showPatchNotes, setShowPatchNotes] = useState(false);
 
   useEffect(() => {
     hydrate();
@@ -95,7 +98,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             href="/"
             onClick={() => sound.playClick()}
             title="Quizzit Home"
-            className={`focus-ring flex items-center gap-3 rounded-2xl ${
+            className={`focus-ring flex items-center gap-2.5 rounded-2xl ${
               collapsed ? "p-1" : "px-2 py-1.5"
             }`}
           >
@@ -154,7 +157,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           })}
         </nav>
 
-        {/* Theme & Version Footer */}
+        {/* Theme Footer */}
         <div className="mt-auto flex w-full flex-col gap-2 pt-4 border-t-2 border-border">
           <button
             type="button"
@@ -179,22 +182,49 @@ export function AppShell({ children }: { children: ReactNode }) {
               </span>
             )}
           </button>
-          <p className="text-center text-xs font-extrabold text-text-faint">
-            v1.0
-          </p>
+
+          <button
+            type="button"
+            onClick={() => {
+              sound.playClick();
+              setShowPatchNotes(true);
+            }}
+            title="View patch notes"
+            className={`focus-ring flex min-h-11 w-full items-center rounded-xl border-2 border-border bg-surface text-sm font-bold text-text-muted hover:border-border-strong hover:text-text ${
+              collapsed ? "justify-center px-0" : "justify-between px-3"
+            }`}
+          >
+            {!collapsed && <span>Patch Notes</span>}
+            <span className="uppercase text-xs font-extrabold text-brand-text">
+              {APP_VERSION}
+            </span>
+          </button>
         </div>
       </aside>
 
       {/* Mobile Top Bar */}
       <header className="flex md:hidden items-center justify-between border-b-2 border-border bg-surface px-4 py-3 sticky top-0 z-30">
-        <Link href="/" className="flex items-center gap-2.5">
-          <img
-            src="/mascot/logo.png"
-            alt="Quizzit mascot"
-            className="h-9 w-9 shrink-0 object-contain"
-          />
-          <span className="text-xl font-extrabold text-brand-text">Quizzit</span>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2.5">
+            <img
+              src="/mascot/logo.png"
+              alt="Quizzit mascot"
+              className="h-9 w-9 shrink-0 object-contain"
+            />
+            <span className="text-xl font-extrabold text-brand-text">Quizzit</span>
+          </Link>
+          <button
+            type="button"
+            onClick={() => {
+              sound.playClick();
+              setShowPatchNotes(true);
+            }}
+            title="View patch notes"
+            className="focus-ring rounded-full border border-border bg-bg-subtle px-2 py-0.5 text-[11px] font-extrabold text-text-muted"
+          >
+            {APP_VERSION}
+          </button>
+        </div>
 
         <div className="flex items-center gap-2">
           <button
@@ -243,6 +273,37 @@ export function AppShell({ children }: { children: ReactNode }) {
         })}
       </nav>
       </div>
+
+      <Modal
+        open={showPatchNotes}
+        onClose={() => setShowPatchNotes(false)}
+        title={`Patch Notes (${APP_VERSION})`}
+      >
+        <div className="max-h-80 overflow-y-auto space-y-5 pr-1">
+          {PATCH_NOTES.map((note) => (
+            <div key={note.version} className="space-y-2">
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="shrink-0 rounded-full bg-brand-tint px-2.5 py-0.5 text-xs font-extrabold text-brand-text">
+                    {note.version}
+                  </span>
+                  <h3 className="text-sm font-extrabold text-text leading-snug">
+                    {note.title}
+                  </h3>
+                </div>
+                <span className="shrink-0 text-xs font-bold text-text-faint">
+                  {note.date}
+                </span>
+              </div>
+              <ul className="list-disc pl-5 space-y-1 text-sm font-semibold text-text-muted">
+                {note.changes.map((c, idx) => (
+                  <li key={idx}>{c}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </Modal>
     </MotionConfig>
   );
 }

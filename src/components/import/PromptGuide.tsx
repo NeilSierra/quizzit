@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { QuestionTypeIcon } from "@/components/QuestionTypeIcon";
 import { sound } from "@/lib/sound";
 import type { QuestionType } from "@/lib/types";
 
@@ -72,7 +73,7 @@ function buildPrompt(
       ...schemaParts,
       "",
       "Rules:",
-      "- Return ONLY valid JSON inside a single code block, with no extra commentary.",
+      "- Make the output a downloadable .json file (e.g. quiz.json), or return ONLY valid JSON inside a single code block if file download is not available, with no extra commentary.",
       "- Every question must have a non-empty prompt and a helpful explanation.",
     ].join("\n");
   }
@@ -106,12 +107,12 @@ function buildPrompt(
     "Column rules:",
     ...csvNotes,
     '- Wrap any cell containing commas or quotes in double quotes ("...").',
-    "- Return ONLY the raw CSV inside a single code block, with no extra commentary.",
+    "- Make the output a downloadable .csv file (e.g. quiz.csv), or return ONLY the raw CSV inside a single code block if file download is not available, with no extra commentary.",
   ].join("\n");
 }
 
 export function PromptGuide() {
-  const [format, setFormat] = useState<"json" | "csv">("json");
+  const [format, setFormat] = useState<"json" | "csv">("csv");
   const [types, setTypes] = useState<QuestionType[]>([
     "multiple_choice",
     "identification",
@@ -173,7 +174,7 @@ export function PromptGuide() {
               Output Format
             </span>
             <div className="grid grid-cols-2 gap-2">
-              {(["json", "csv"] as const).map((fmt) => (
+              {(["csv", "json"] as const).map((fmt) => (
                 <button
                   key={fmt}
                   type="button"
@@ -187,7 +188,7 @@ export function PromptGuide() {
                       : "border-border bg-surface text-text-muted hover:border-border-strong"
                   }`}
                 >
-                  {fmt === "json" ? "JSON (Best)" : "CSV"}
+                  {fmt === "csv" ? "CSV (Default)" : "JSON"}
                 </button>
               ))}
             </div>
@@ -255,13 +256,14 @@ export function PromptGuide() {
                   key={opt.id}
                   type="button"
                   onClick={() => toggleType(opt.id)}
-                  className={`focus-ring h-10 rounded-xl border-2 px-3 text-xs font-extrabold uppercase tracking-wide transition-colors ${
+                  className={`focus-ring flex h-10 items-center justify-center gap-2 rounded-xl border-2 px-3 text-xs font-extrabold uppercase tracking-wide transition-colors ${
                     active
                       ? "border-brand-fill bg-brand-tint text-brand-text"
                       : "border-border bg-surface text-text-muted hover:border-border-strong"
                   }`}
                 >
-                  {opt.label}
+                  <QuestionTypeIcon type={opt.id} />
+                  <span>{opt.label}</span>
                 </button>
               );
             })}

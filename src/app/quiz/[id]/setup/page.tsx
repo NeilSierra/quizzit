@@ -3,10 +3,11 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Play } from "lucide-react";
+import { ArrowLeft, Layers, Play } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Toggle } from "@/components/ui/Toggle";
+import { QuestionTypeIcon } from "@/components/QuestionTypeIcon";
 import { sound } from "@/lib/sound";
 import type { QuestionType, QuizSettings } from "@/lib/types";
 import { useLibrary } from "@/store/useLibrary";
@@ -170,13 +171,18 @@ export default function QuizSetupPage() {
                   sound.playClick();
                   setTargetMode(mode.id);
                 }}
-                className={`focus-ring rounded-xl border-2 px-3 py-2.5 text-center text-xs font-extrabold uppercase tracking-wide transition-colors ${
+                className={`focus-ring flex items-center justify-center gap-1.5 rounded-xl border-2 px-3 py-2.5 text-center text-xs font-extrabold uppercase tracking-wide transition-colors ${
                   active
                     ? "border-brand-fill bg-brand-tint text-brand-text"
                     : "border-border bg-surface text-text hover:border-border-strong"
                 }`}
               >
-                {mode.label}
+                {mode.id === "original" ? (
+                  <Layers className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                ) : (
+                  <QuestionTypeIcon type={mode.id} className="h-3.5 w-3.5 shrink-0" />
+                )}
+                <span>{mode.label}</span>
               </button>
             );
           })}
@@ -207,8 +213,9 @@ export default function QuizSetupPage() {
                         : "border-border bg-surface text-text hover:border-border-strong"
                     }`}
                   >
-                    <span className="text-sm font-extrabold">
-                      {TYPE_LABELS[type]}
+                    <span className="flex items-center gap-1.5 text-sm font-extrabold">
+                      <QuestionTypeIcon type={type} />
+                      <span>{TYPE_LABELS[type]}</span>
                     </span>
                     <span className="text-xs font-bold opacity-80">
                       {count} {count === 1 ? "question" : "questions"}

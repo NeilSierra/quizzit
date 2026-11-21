@@ -22,6 +22,7 @@ import { Timer } from "@/components/quiz/Timer";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Toast } from "@/components/ui/Toast";
+import { QuestionTypeIcon } from "@/components/QuestionTypeIcon";
 import { sound } from "@/lib/sound";
 import type { Question, UserAnswer } from "@/lib/types";
 import { useLibrary } from "@/store/useLibrary";
@@ -478,7 +479,10 @@ export default function QuizPlayPage() {
                 Question {currentIndex + 1} of {questions.length}
               </span>
               <div className="flex items-center gap-2">
-                <span>{currentQuestion.type.replace("_", " ")}</span>
+                <span className="inline-flex items-center gap-1.5">
+                  <QuestionTypeIcon type={currentQuestion.type} className="h-3.5 w-3.5" />
+                  <span>{currentQuestion.type.replace("_", " ")}</span>
+                </span>
                 {!checkedAnswer && (
                   <motion.button
                     type="button"
