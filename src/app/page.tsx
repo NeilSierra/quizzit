@@ -65,21 +65,23 @@ export default function HomePage() {
         </Card>
       )}
 
-      {/* Home Banner */}
-      <div className="overflow-hidden rounded-2xl border-2 border-border bg-surface shadow-[0_2px_0_var(--border)]">
-        <img
-          src="/mascot/banner.png"
-          alt="Quizzit banner"
-          className="w-full min-h-[100px] max-h-64 object-cover object-center"
-        />
+      {/* Centered Brand Intro */}
+      <div className="flex flex-col items-center text-center gap-1.5 py-2">
+        <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-brand-text">
+          Quizzit
+        </h1>
+        <p className="max-w-lg text-base sm:text-lg font-semibold text-text-muted">
+          Import your own questions, customize your practice, and master every
+          topic.
+        </p>
       </div>
 
       {/* Hero */}
       <Card className="p-6 sm:p-8 flex flex-col gap-6">
         <div className="flex flex-col gap-3 max-w-2xl">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-text tracking-tight leading-tight">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-text tracking-tight leading-tight">
             Bring your own questions. Master every topic.
-          </h1>
+          </h2>
           <p className="text-base sm:text-lg font-semibold text-text-muted">
             Import JSON or CSV study sets, customize your practice mode, and
             track your progress and personal bests—right in your browser.
@@ -178,9 +180,9 @@ export default function HomePage() {
             {recentQuizzes.map((quiz) => (
               <Card
                 key={quiz.id}
-                className="flex items-center justify-between gap-4"
+                className="flex min-w-0 overflow-hidden items-center justify-between gap-4"
               >
-                <div className="min-w-0">
+                <div className="flex-1 min-w-0">
                   <h3 className="truncate text-lg font-extrabold text-text">
                     {quiz.title}
                   </h3>

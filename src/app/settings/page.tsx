@@ -72,11 +72,16 @@ export default function SettingsPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div>
-        <h1 className="text-3xl font-extrabold text-text">Preferences</h1>
-        <p className="text-base font-semibold text-text-muted">
-          Customize appearance, sound effects, and local device backups.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-extrabold text-text">Settings</h1>
+          <p className="text-base font-semibold text-text-muted">
+            Customize appearance, sound effects, and local device backups.
+          </p>
+        </div>
+        <span className="shrink-0 rounded-full border-2 border-border bg-surface px-3 py-1 text-xs font-extrabold text-text-muted">
+          v1.0
+        </span>
       </div>
 
       {/* Appearance & Audio */}

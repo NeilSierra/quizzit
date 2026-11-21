@@ -24,7 +24,7 @@ const NAV_ITEMS = [
   { href: "/import", label: "Import", icon: Upload },
   { href: "/library", label: "Library", icon: BookOpen },
   { href: "/history", label: "History", icon: History },
-  { href: "/settings", label: "Preferences", icon: Settings },
+  { href: "/settings", label: "Settings", icon: Settings },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -154,8 +154,8 @@ export function AppShell({ children }: { children: ReactNode }) {
           })}
         </nav>
 
-        {/* Theme Footer */}
-        <div className="mt-auto flex w-full flex-col gap-3 pt-4 border-t-2 border-border">
+        {/* Theme & Version Footer */}
+        <div className="mt-auto flex w-full flex-col gap-2 pt-4 border-t-2 border-border">
           <button
             type="button"
             onClick={cycleTheme}
@@ -179,6 +179,9 @@ export function AppShell({ children }: { children: ReactNode }) {
               </span>
             )}
           </button>
+          <p className="text-center text-xs font-extrabold text-text-faint">
+            v1.0
+          </p>
         </div>
       </aside>
 
@@ -217,7 +220,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* Mobile Bottom Tab Bar */}
       <nav
         aria-label="Mobile navigation"
-        className="fixed bottom-0 inset-x-0 z-30 flex md:hidden items-center justify-around border-t-2 border-border bg-surface px-2 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))]"
+        className="fixed bottom-0 inset-x-0 z-30 grid md:hidden grid-cols-5 gap-1 border-t-2 border-border bg-surface px-1.5 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))]"
       >
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
           const active =
@@ -227,14 +230,14 @@ export function AppShell({ children }: { children: ReactNode }) {
               key={href}
               href={href}
               onClick={() => sound.playClick()}
-              className={`focus-ring flex min-h-12 min-w-14 flex-col items-center justify-center gap-0.5 rounded-xl px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide ${
+              className={`focus-ring flex min-h-[52px] w-full min-w-0 flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1 text-[10px] font-extrabold uppercase tracking-wide ${
                 active
                   ? "bg-brand-tint text-brand-text"
                   : "text-text-muted"
               }`}
             >
-              <Icon className="h-5 w-5" strokeWidth={active ? 2.5 : 2} />
-              <span>{label}</span>
+              <Icon className="h-5 w-5 shrink-0" strokeWidth={active ? 2.5 : 2} />
+              <span className="w-full truncate text-center">{label}</span>
             </Link>
           );
         })}
