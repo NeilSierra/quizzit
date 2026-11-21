@@ -11,9 +11,27 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ??
+      (process.env.VERCEL_PROJECT_PRODUCTION_URL
+        ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+        : "http://localhost:3000")
+  ),
   title: "Quizzit",
   description:
     "Bring your own question files, customize your quiz, and celebrate every milestone.",
+  openGraph: {
+    title: "Quizzit",
+    description:
+      "Bring your own question files, customize your quiz, and celebrate every milestone.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Quizzit",
+    description:
+      "Bring your own question files, customize your quiz, and celebrate every milestone.",
+  },
 };
 
 const THEME_INIT_SCRIPT = `

@@ -1,4 +1,4 @@
-export const APP_VERSION = "v2.3";
+export const APP_VERSION = "v2.4";
 
 export interface PatchNote {
   version: string;
@@ -8,6 +8,14 @@ export interface PatchNote {
 }
 
 export const PATCH_NOTES: PatchNote[] = [
+  {
+    version: "v2.4",
+    date: "2026-11-22",
+    title: "Social Share Preview (Open Graph Image)",
+    changes: [
+      "Added a 1200×630 Open Graph & Twitter preview image featuring the Quizzit mascot and tagline when sharing links.",
+    ],
+  },
   {
     version: "v2.3",
     date: "2026-11-22",
