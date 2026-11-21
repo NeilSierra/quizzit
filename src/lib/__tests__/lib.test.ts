@@ -3,6 +3,7 @@ import { convertQuestionsToMode } from "../convert";
 import { isTypoMatch, normalize } from "../normalize";
 import { CSV_TEMPLATE, parseCsvImport } from "../parsers/csv";
 import { JSON_TEMPLATE, parseJsonImport } from "../parsers/json";
+import { getQuizProgress } from "../progress";
 import { computeGuestMergeDiff } from "../supabase/sync";
 import {
   gradeQuestion,
@@ -158,5 +159,59 @@ describe("computeGuestMergeDiff", () => {
     expect(diff.setsToInsert[0].id).toBe("q2");
     expect(diff.mergedSets).toHaveLength(2);
     expect(diff.mergedBadges).toEqual(["first_quiz", "perfect_score"]);
+  });
+});
+
+describe("getQuizProgress (redemption & unquizzed)", () => {
+  it("carries over wrong answers as redemption until answered correctly", () => {
+    const qs = parseJsonImport(JSON_TEMPLATE).validQuestions;
+    const baseSettings = {
+      types: ["multiple_choice", "identification", "enumeration"] as (
+        | "multiple_choice"
+        | "identification"
+        | "enumeration"
+      )[],
+      shuffleQuestions: false,
+      shuffleChoices: false,
+      questionCount: "all" as const,
+      feedbackMode: "immediate" as const,
+    };
+
+    const attempt1 = {
+      id: "a1",
+      quizSetId: "set1",
+      quizTitle: "Bio",
+      settings: baseSettings,
+      answers: [
+        { questionId: qs[0].id, response: [1], score: 1, isCorrect: true, timeMs: 100 },
+        { questionId: qs[1].id, response: "wrong", score: 0, isCorrect: false, timeMs: 100 },
+      ],
+      startedAt: 1000,
+      finishedAt: 2000,
+      totalScore: 1,
+      accuracy: 50,
+      longestStreak: 1,
+    };
+
+    const p1 = getQuizProgress(qs, [attempt1], "set1");
+    expect(p1.masteredCount).toBe(1);
+    expect(p1.redemption.map((q) => q.id)).toEqual([qs[1].id]);
+    expect(p1.unquizzed.map((q) => q.id)).toEqual([qs[2].id]);
+
+    // Now redeem qs[1] in attempt2
+    const attempt2 = {
+      ...attempt1,
+      id: "a2",
+      answers: [
+        { questionId: qs[1].id, response: "Photosynthesis", score: 1, isCorrect: true, timeMs: 100 },
+      ],
+      startedAt: 3000,
+      finishedAt: 4000,
+    };
+
+    const p2 = getQuizProgress(qs, [attempt2, attempt1], "set1");
+    expect(p2.masteredCount).toBe(2);
+    expect(p2.redemption).toHaveLength(0);
+    expect(p2.unquizzed.map((q) => q.id)).toEqual([qs[2].id]);
   });
 });

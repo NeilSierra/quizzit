@@ -27,8 +27,8 @@ export default function HelpPage() {
             Learn how to use Quizzit and create your own CSV or JSON quizzes.
           </p>
         </div>
-        <Link href="/import" className="shrink-0">
-          <Button variant="primary">
+        <Link href="/import" className="w-full sm:w-auto shrink-0">
+          <Button variant="primary" className="w-full sm:w-auto">
             <Upload className="h-4 w-4" />
             Go to Import
           </Button>
@@ -193,8 +193,8 @@ export default function HelpPage() {
               </p>
             </div>
           </div>
-          <Link href="/import" className="shrink-0">
-            <Button variant="primary">Open Prompt Guide</Button>
+          <Link href="/import" className="w-full sm:w-auto shrink-0">
+            <Button variant="primary" className="w-full sm:w-auto">Open Prompt Guide</Button>
           </Link>
         </Card>
 

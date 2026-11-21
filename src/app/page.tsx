@@ -54,11 +54,19 @@ export default function HomePage() {
               {pendingResume.questions.length}
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="secondary" onClick={discardSavedSession}>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+            <Button
+              variant="secondary"
+              onClick={discardSavedSession}
+              className="w-full sm:w-auto"
+            >
               Discard
             </Button>
-            <Button variant="primary" onClick={handleResume}>
+            <Button
+              variant="primary"
+              onClick={handleResume}
+              className="w-full sm:w-auto"
+            >
               <Play className="h-4 w-4 fill-current" />
               Resume
             </Button>

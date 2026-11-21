@@ -1,4 +1,4 @@
-export const APP_VERSION = "v2.4";
+export const APP_VERSION = "v3.0";
 
 export interface PatchNote {
   version: string;
@@ -8,6 +8,17 @@ export interface PatchNote {
 }
 
 export const PATCH_NOTES: PatchNote[] = [
+  {
+    version: "v3.0",
+    date: "2026-11-22",
+    title: "Installable PWA, Redemption Questions & Compact Library",
+    changes: [
+      "Made Quizzit an installable Progressive Web App (PWA) with offline caching and standalone app support on desktop and mobile.",
+      "Added Redemption Questions: previously wrong answers automatically carry over into your next continue session until you master them.",
+      "Redesigned Library quiz cards to be more compact with an icon-only Start button and a triple-dot actions menu (Rename, Export, Delete).",
+      "Improved mobile responsiveness for all buttons and cards across every screen, and fixed the duplicate clear icon in the Library search bar.",
+    ],
+  },
   {
     version: "v2.4",
     date: "2026-11-22",

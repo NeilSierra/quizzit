@@ -9,6 +9,7 @@ import {
   ArrowRight,
   Flame,
   Lightbulb,
+  RotateCcw,
   Volume2,
   VolumeX,
   X,
@@ -475,9 +476,17 @@ export default function QuizPlayPage() {
             className="flex flex-col gap-6"
           >
             <div className="flex items-center justify-between gap-2 text-xs font-extrabold uppercase tracking-wider text-text-muted">
-              <span>
-                Question {currentIndex + 1} of {questions.length}
-              </span>
+              <div className="flex items-center gap-2">
+                <span>
+                  Question {currentIndex + 1} of {questions.length}
+                </span>
+                {settings.redemptionIds?.includes(currentQuestion.id) && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-warning/40 bg-warning/15 px-2 py-0.5 text-[10px] font-extrabold text-warning">
+                    <RotateCcw className="h-3 w-3" aria-hidden="true" />
+                    Redemption
+                  </span>
+                )}
+              </div>
               <div className="flex items-center gap-2">
                 <span className="inline-flex items-center gap-1.5">
                   <QuestionTypeIcon type={currentQuestion.type} className="h-3.5 w-3.5" />

@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   BookOpen,
   Download,
+  MoreVertical,
   Pencil,
   Play,
   Search,
@@ -30,6 +31,7 @@ export default function LibraryPage() {
   const importSampleQuiz = useLibrary((s) => s.importSampleQuiz);
 
   const [search, setSearch] = useState("");
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [renaming, setRenaming] = useState<QuizSet | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const [deleting, setDeleting] = useState<QuizSet | null>(null);
@@ -88,8 +90,8 @@ export default function LibraryPage() {
             device
           </p>
         </div>
-        <Link href="/import">
-          <Button variant="primary">
+        <Link href="/import" className="w-full sm:w-auto">
+          <Button variant="primary" className="w-full sm:w-auto">
             <Upload className="h-4 w-4" />
             Import Quiz
           </Button>
@@ -131,7 +133,8 @@ export default function LibraryPage() {
               aria-hidden="true"
             />
             <input
-              type="search"
+              type="text"
+              inputMode="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search quizzes by title or description..."
@@ -163,101 +166,143 @@ export default function LibraryPage() {
               </Button>
             </Card>
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
-              {filteredQuizSets.map((quiz) => {
-            const best = getBestScore(quiz.id);
-            const mc = quiz.questions.filter(
-              (q) => q.type === "multiple_choice"
-            ).length;
-            const id = quiz.questions.filter(
-              (q) => q.type === "identification"
-            ).length;
-            const en = quiz.questions.filter(
-              (q) => q.type === "enumeration"
-            ).length;
+            <>
+              {openMenuId && (
+                <div
+                  className="fixed inset-0 z-20"
+                  aria-hidden="true"
+                  onClick={() => setOpenMenuId(null)}
+                />
+              )}
+              <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
+                {filteredQuizSets.map((quiz) => {
+                  const best = getBestScore(quiz.id);
+                  const mc = quiz.questions.filter(
+                    (q) => q.type === "multiple_choice"
+                  ).length;
+                  const id = quiz.questions.filter(
+                    (q) => q.type === "identification"
+                  ).length;
+                  const en = quiz.questions.filter(
+                    (q) => q.type === "enumeration"
+                  ).length;
+                  const menuOpen = openMenuId === quiz.id;
 
-            return (
-              <Card key={quiz.id} className="flex flex-col justify-between gap-4">
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-start justify-between gap-2">
-                    <h2 className="text-xl font-extrabold text-text leading-snug">
-                      {quiz.title}
-                    </h2>
-                    {best !== null && (
-                      <span className="shrink-0 rounded-full bg-success-bg px-2.5 py-0.5 text-xs font-extrabold text-success">
-                        Best: {best}%
-                      </span>
-                    )}
-                  </div>
-                  {quiz.description && (
-                    <p className="text-sm font-semibold text-text-muted">
-                      {quiz.description}
-                    </p>
-                  )}
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    <span className="rounded-lg bg-brand-tint px-2.5 py-0.5 text-xs font-extrabold text-brand-text">
-                      {quiz.questions.length} Qs
-                    </span>
-                    {mc > 0 && (
-                      <span className="rounded-lg bg-bg-subtle px-2.5 py-0.5 text-xs font-bold text-text-muted">
-                        MC: {mc}
-                      </span>
-                    )}
-                    {id > 0 && (
-                      <span className="rounded-lg bg-bg-subtle px-2.5 py-0.5 text-xs font-bold text-text-muted">
-                        ID: {id}
-                      </span>
-                    )}
-                    {en > 0 && (
-                      <span className="rounded-lg bg-bg-subtle px-2.5 py-0.5 text-xs font-bold text-text-muted">
-                        ENUM: {en}
-                      </span>
-                    )}
-                  </div>
-                </div>
+                  return (
+                    <Card
+                      key={quiz.id}
+                      className="flex min-w-0 items-center justify-between gap-3 p-3.5 sm:p-4"
+                    >
+                      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <h2 className="truncate text-base sm:text-lg font-extrabold text-text leading-snug">
+                            {quiz.title}
+                          </h2>
+                          {best !== null && (
+                            <span className="shrink-0 rounded-full bg-success-bg px-2 py-0.5 text-[11px] font-extrabold text-success">
+                              {best}%
+                            </span>
+                          )}
+                        </div>
+                        {quiz.description && (
+                          <p className="truncate text-xs font-semibold text-text-muted">
+                            {quiz.description}
+                          </p>
+                        )}
+                        <div className="flex flex-wrap gap-1">
+                          <span className="rounded-md bg-brand-tint px-2 py-0.5 text-[11px] font-extrabold text-brand-text">
+                            {quiz.questions.length} Qs
+                          </span>
+                          {mc > 0 && (
+                            <span className="rounded-md bg-bg-subtle px-2 py-0.5 text-[11px] font-bold text-text-muted">
+                              MC: {mc}
+                            </span>
+                          )}
+                          {id > 0 && (
+                            <span className="rounded-md bg-bg-subtle px-2 py-0.5 text-[11px] font-bold text-text-muted">
+                              ID: {id}
+                            </span>
+                          )}
+                          {en > 0 && (
+                            <span className="rounded-md bg-bg-subtle px-2 py-0.5 text-[11px] font-bold text-text-muted">
+                              ENUM: {en}
+                            </span>
+                          )}
+                        </div>
+                      </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t-2 border-border">
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setRenaming(quiz);
-                        setRenameValue(quiz.title);
-                      }}
-                      aria-label={`Rename ${quiz.title}`}
-                      className="focus-ring flex h-11 w-11 items-center justify-center rounded-xl text-text-muted hover:bg-bg-subtle hover:text-text"
-                    >
-                      <Pencil className="h-5 w-5" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleExport(quiz)}
-                      aria-label={`Export ${quiz.title}`}
-                      className="focus-ring flex h-11 w-11 items-center justify-center rounded-xl text-text-muted hover:bg-bg-subtle hover:text-text"
-                    >
-                      <Download className="h-5 w-5" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setDeleting(quiz)}
-                      aria-label={`Delete ${quiz.title}`}
-                      className="focus-ring flex h-11 w-11 items-center justify-center rounded-xl text-text-muted hover:bg-danger-bg hover:text-danger"
-                    >
-                      <Trash2 className="h-5 w-5" />
-                    </button>
-                  </div>
+                      <div className="relative flex items-center gap-1.5 shrink-0">
+                        <Link href={`/quiz/${quiz.id}/setup`}>
+                          <Button
+                            variant="primary"
+                            aria-label={`Start ${quiz.title}`}
+                            title="Start quiz"
+                            className="!min-h-12 h-12 !w-12 !px-0"
+                          >
+                            <Play className="h-5 w-5 fill-current" />
+                          </Button>
+                        </Link>
 
-                  <Link href={`/quiz/${quiz.id}/setup`}>
-                    <Button variant="primary">
-                      <Play className="h-4 w-4 fill-current" />
-                      Start
-                    </Button>
-                  </Link>
-                </div>
-              </Card>
-            );
-          })}
-            </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            sound.playClick();
+                            setOpenMenuId(menuOpen ? null : quiz.id);
+                          }}
+                          aria-expanded={menuOpen}
+                          aria-label={`More actions for ${quiz.title}`}
+                          className="focus-ring flex h-11 w-11 items-center justify-center rounded-xl border-2 border-transparent text-text-muted hover:border-border hover:bg-bg-subtle hover:text-text transition-colors"
+                        >
+                          <MoreVertical className="h-5 w-5" />
+                        </button>
+
+                        {menuOpen && (
+                          <div className="absolute right-0 top-full mt-1.5 z-30 w-40 rounded-2xl border-2 border-border bg-surface-raised p-1.5 shadow-xl flex flex-col gap-1">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                sound.playClick();
+                                setOpenMenuId(null);
+                                setRenaming(quiz);
+                                setRenameValue(quiz.title);
+                              }}
+                              className="focus-ring flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-bold text-text hover:bg-bg-subtle"
+                            >
+                              <Pencil className="h-4 w-4 text-text-muted" />
+                              <span>Rename</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                sound.playClick();
+                                setOpenMenuId(null);
+                                handleExport(quiz);
+                              }}
+                              className="focus-ring flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-bold text-text hover:bg-bg-subtle"
+                            >
+                              <Download className="h-4 w-4 text-text-muted" />
+                              <span>Export</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                sound.playClick();
+                                setOpenMenuId(null);
+                                setDeleting(quiz);
+                              }}
+                              className="focus-ring flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-bold text-danger hover:bg-danger-bg"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              <span>Delete</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            </>
           )}
         </>
       )}

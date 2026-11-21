@@ -59,6 +59,9 @@ export function AppShell({ children }: { children: ReactNode }) {
     hydrate();
     initAuth();
     checkSavedSession();
+    if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
+    }
     try {
       if (localStorage.getItem("quizapp:sidebar-collapsed") === "true") {
         setCollapsed(true);

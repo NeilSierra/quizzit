@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Nunito } from "next/font/google";
 import { AppShell } from "@/components/AppShell";
 import "./globals.css";
@@ -20,6 +20,14 @@ export const metadata: Metadata = {
   title: "Quizzit",
   description:
     "Bring your own question files, customize your quiz, and celebrate every milestone.",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Quizzit",
+  },
+  icons: {
+    apple: "/mascot/logo.png",
+  },
   openGraph: {
     title: "Quizzit",
     description:
@@ -32,6 +40,13 @@ export const metadata: Metadata = {
     description:
       "Bring your own question files, customize your quiz, and celebrate every milestone.",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#225577",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 const THEME_INIT_SCRIPT = `

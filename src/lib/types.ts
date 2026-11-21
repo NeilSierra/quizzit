@@ -51,6 +51,7 @@ export interface QuizSettings {
   feedbackMode: "immediate" | "end";
   timerMinutes?: number;
   typoTolerance?: boolean;
+  redemptionIds?: string[];
 }
 
 export interface UserAnswer {

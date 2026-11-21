@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Toggle } from "@/components/ui/Toggle";
 import { QuestionTypeIcon } from "@/components/QuestionTypeIcon";
+import { getQuizProgress } from "@/lib/progress";
 import { sound } from "@/lib/sound";
 import type { QuestionType, QuizSettings } from "@/lib/types";
 import { useLibrary } from "@/store/useLibrary";
@@ -66,24 +67,19 @@ export default function QuizSetupPage() {
   const [timerMinutes, setTimerMinutes] = useState(10);
   const [typoTolerance, setTypoTolerance] = useState(true);
   const [unquizzedOnly, setUnquizzedOnly] = useState(false);
+  const [includeRedemption, setIncludeRedemption] = useState(true);
 
-  const unquizzedQuestions = useMemo(() => {
-    if (!quizSet) return [];
-    const quizzedIds = new Set<string>();
-    for (const att of attempts) {
-      if (att.quizSetId === quizSet.id) {
-        for (const ans of att.answers) {
-          quizzedIds.add(ans.questionId);
-        }
-      }
+  const progress = useMemo(() => {
+    if (!quizSet) {
+      return {
+        unquizzed: [],
+        redemption: [],
+        masteredCount: 0,
+        hasPriorAttempts: false,
+      };
     }
-    return quizSet.questions.filter((q) => !quizzedIds.has(q.id));
+    return getQuizProgress(quizSet.questions, attempts, quizSet.id);
   }, [quizSet, attempts]);
-
-  const hasPriorAttempts = useMemo(
-    () => Boolean(quizSet && attempts.some((a) => a.quizSetId === quizSet.id)),
-    [quizSet, attempts]
-  );
 
   if (!hydrated) {
     return (
@@ -108,9 +104,13 @@ export default function QuizSetupPage() {
   }
 
   const activeTypes = selectedTypes ?? availableTypes;
+  const continuePool = [
+    ...(includeRedemption ? progress.redemption : []),
+    ...progress.unquizzed,
+  ];
   const sourcePool =
-    unquizzedOnly && unquizzedQuestions.length > 0
-      ? unquizzedQuestions
+    unquizzedOnly && continuePool.length > 0
+      ? continuePool
       : quizSet.questions;
   const matchingCount =
     targetMode === "original"
@@ -142,6 +142,7 @@ export default function QuizSetupPage() {
       feedbackMode,
       timerMinutes: useTimer ? Math.max(1, timerMinutes) : undefined,
       typoTolerance,
+      redemptionIds: progress.redemption.map((q) => q.id),
     };
     sound.playStart();
     startSession({ ...quizSet, questions: sourcePool }, settings);
@@ -359,18 +360,34 @@ export default function QuizSetupPage() {
         </div>
 
         <div className="divide-y-2 divide-border">
-          {hasPriorAttempts && (
-            <Toggle
-              checked={unquizzedOnly && unquizzedQuestions.length > 0}
-              onChange={setUnquizzedOnly}
-              label="Continue unquizzed questions only"
-              description={
-                unquizzedQuestions.length > 0
-                  ? `${unquizzedQuestions.length} of ${quizSet.questions.length} not yet quizzed`
-                  : "All questions in this set have been quizzed"
-              }
-              disabled={unquizzedQuestions.length === 0}
-            />
+          {progress.hasPriorAttempts && (
+            <>
+              <Toggle
+                checked={unquizzedOnly && continuePool.length > 0}
+                onChange={setUnquizzedOnly}
+                label="Continue remaining questions only"
+                description={
+                  continuePool.length > 0
+                    ? `${progress.unquizzed.length} unquizzed${
+                        includeRedemption && progress.redemption.length > 0
+                          ? ` + ${progress.redemption.length} redemption`
+                          : ""
+                      } remaining`
+                    : "All questions in this set have been mastered"
+                }
+                disabled={continuePool.length === 0}
+              />
+              {progress.redemption.length > 0 && unquizzedOnly && (
+                <Toggle
+                  checked={includeRedemption}
+                  onChange={setIncludeRedemption}
+                  label="Include redemption questions"
+                  description={`Carry over ${progress.redemption.length} previously wrong ${
+                    progress.redemption.length === 1 ? "question" : "questions"
+                  }`}
+                />
+              )}
+            </>
           )}
           <Toggle
             checked={shuffleQuestions}

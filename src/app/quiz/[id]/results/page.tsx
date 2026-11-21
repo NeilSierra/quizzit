@@ -18,6 +18,7 @@ import {
 import { ScoreRing } from "@/components/results/ScoreRing";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { getQuizProgress } from "@/lib/progress";
 import { sound } from "@/lib/sound";
 import type { QuestionType } from "@/lib/types";
 import { useLibrary } from "@/store/useLibrary";
@@ -146,28 +147,34 @@ export default function ResultsPage() {
     previousLatest !== null ? attempt.accuracy - previousLatest : null;
 
   const fullQuizSet = quizSets.find((s) => s.id === attempt.quizSetId);
-  const unquizzedQuestions = (() => {
-    if (!fullQuizSet) return [];
-    const quizzedIds = new Set<string>();
-    for (const att of attempts) {
-      if (att.quizSetId === attempt.quizSetId) {
-        for (const ans of att.answers) {
-          quizzedIds.add(ans.questionId);
-        }
-      }
-    }
-    return fullQuizSet.questions.filter((q) => !quizzedIds.has(q.id));
-  })();
+  const progress = fullQuizSet
+    ? getQuizProgress(fullQuizSet.questions, attempts, attempt.quizSetId)
+    : { unquizzed: [], redemption: [], masteredCount: 0, hasPriorAttempts: false };
 
-  const handleContinueUnquizzed = () => {
-    if (!fullQuizSet || unquizzedQuestions.length === 0) return;
+  const continuePool = [...progress.redemption, ...progress.unquizzed];
+
+  const handleContinueRemaining = () => {
+    if (!fullQuizSet || continuePool.length === 0) return;
     sound.playStart();
     startSession(
-      { ...fullQuizSet, questions: unquizzedQuestions },
-      attempt.settings
+      { ...fullQuizSet, questions: continuePool },
+      {
+        ...attempt.settings,
+        redemptionIds: progress.redemption.map((q) => q.id),
+      }
     );
     router.push(`/quiz/${id}/play`);
   };
+
+  const continueLabel = (() => {
+    if (progress.unquizzed.length > 0 && progress.redemption.length > 0) {
+      return `Continue (${progress.unquizzed.length} new + ${progress.redemption.length} redemption)`;
+    }
+    if (progress.redemption.length > 0) {
+      return `Redemption Round (${progress.redemption.length} to redeem)`;
+    }
+    return `Continue Unquizzed Questions (${progress.unquizzed.length} left)`;
+  })();
 
   const handleRetryWrong = () => {
     if (wrongQuestions.length === 0) return;
@@ -315,21 +322,21 @@ export default function ResultsPage() {
 
       {/* Next Actions */}
       <div className="flex flex-col gap-3">
-        {unquizzedQuestions.length > 0 && (
+        {continuePool.length > 0 && (
           <Button
             variant="primary"
             fullWidth
             silent
-            onClick={handleContinueUnquizzed}
+            onClick={handleContinueRemaining}
           >
             <Play className="h-4 w-4 fill-current" />
-            Continue Unquizzed Questions ({unquizzedQuestions.length} left)
+            {continueLabel}
           </Button>
         )}
 
         <Link href={`/quiz/${id}/review`}>
           <Button
-            variant={unquizzedQuestions.length > 0 ? "secondary" : "primary"}
+            variant={continuePool.length > 0 ? "secondary" : "primary"}
             fullWidth
           >
             Review Answers

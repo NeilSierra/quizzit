@@ -203,37 +203,35 @@ export function PromptGuide() {
             <span className="text-xs font-extrabold uppercase tracking-wider text-text-muted">
               Number of Questions
             </span>
-            <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
-              <div className="grid grid-cols-2 gap-2 flex-1 min-w-0">
-                <button
-                  type="button"
-                  onClick={() => {
-                    sound.playClick();
-                    setCountMode("max");
-                  }}
-                  className={`focus-ring h-10 rounded-xl border-2 px-2.5 text-xs font-extrabold uppercase tracking-wide whitespace-nowrap transition-colors ${
-                    countMode === "max"
-                      ? "border-brand-fill bg-brand-tint text-brand-text"
-                      : "border-border bg-surface text-text-muted hover:border-border-strong"
-                  }`}
-                >
-                  Max
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    sound.playClick();
-                    setCountMode("custom");
-                  }}
-                  className={`focus-ring h-10 rounded-xl border-2 px-2.5 text-xs font-extrabold uppercase tracking-wide whitespace-nowrap transition-colors ${
-                    countMode === "custom"
-                      ? "border-brand-fill bg-brand-tint text-brand-text"
-                      : "border-border bg-surface text-text-muted hover:border-border-strong"
-                  }`}
-                >
-                  Custom
-                </button>
-              </div>
+            <div className="grid grid-cols-[1fr_1fr_4.5rem] items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  sound.playClick();
+                  setCountMode("max");
+                }}
+                className={`focus-ring h-10 rounded-xl border-2 px-2.5 text-xs font-extrabold uppercase tracking-wide whitespace-nowrap transition-colors ${
+                  countMode === "max"
+                    ? "border-brand-fill bg-brand-tint text-brand-text"
+                    : "border-border bg-surface text-text-muted hover:border-border-strong"
+                }`}
+              >
+                Max
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  sound.playClick();
+                  setCountMode("custom");
+                }}
+                className={`focus-ring h-10 rounded-xl border-2 px-2.5 text-xs font-extrabold uppercase tracking-wide whitespace-nowrap transition-colors ${
+                  countMode === "custom"
+                    ? "border-brand-fill bg-brand-tint text-brand-text"
+                    : "border-border bg-surface text-text-muted hover:border-border-strong"
+                }`}
+              >
+                Custom
+              </button>
               <input
                 id="prompt-count"
                 type="number"
@@ -243,7 +241,7 @@ export function PromptGuide() {
                 aria-label="Custom number of questions"
                 value={count}
                 onChange={(e) => setCount(Number(e.target.value) || 1)}
-                className="h-10 w-20 shrink-0 rounded-xl border-2 border-border bg-bg-subtle dark:bg-surface px-3 text-center font-extrabold text-text focus:border-brand-fill focus:outline-none disabled:bg-disabled-bg disabled:text-text-faint disabled:cursor-not-allowed"
+                className="h-10 w-full rounded-xl border-2 border-border bg-bg-subtle dark:bg-surface px-2 text-center font-extrabold text-text focus:border-brand-fill focus:outline-none disabled:bg-disabled-bg disabled:text-text-faint disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -317,28 +315,30 @@ export function PromptGuide() {
           {promptText}
         </pre>
 
-        <div className="flex flex-wrap items-center gap-2 pt-1">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 pt-1">
           <span className="text-xs font-extrabold uppercase tracking-wider text-text-muted mr-1">
             Open AI Chatbot:
           </span>
-          {[
-            { name: "ChatGPT", url: "https://chatgpt.com" },
-            { name: "Gemini", url: "https://gemini.google.com" },
-            { name: "Claude", url: "https://claude.ai" },
-            { name: "DeepSeek", url: "https://chat.deepseek.com" },
-          ].map((bot) => (
-            <a
-              key={bot.name}
-              href={bot.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => sound.playClick()}
-              className="focus-ring inline-flex items-center gap-1.5 rounded-xl border-2 border-border bg-surface px-3 py-1.5 text-xs font-extrabold text-brand-text shadow-[0_2px_0_var(--border)] hover:border-brand-fill hover:bg-brand-tint transition-colors"
-            >
-              <span>{bot.name}</span>
-              <ExternalLink className="h-3.5 w-3.5" />
-            </a>
-          ))}
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
+            {[
+              { name: "ChatGPT", url: "https://chatgpt.com" },
+              { name: "Gemini", url: "https://gemini.google.com" },
+              { name: "Claude", url: "https://claude.ai" },
+              { name: "DeepSeek", url: "https://chat.deepseek.com" },
+            ].map((bot) => (
+              <a
+                key={bot.name}
+                href={bot.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => sound.playClick()}
+                className="focus-ring inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border-2 border-border bg-surface px-3 py-1.5 text-xs font-extrabold text-brand-text shadow-[0_2px_0_var(--border)] hover:border-brand-fill hover:bg-brand-tint transition-colors"
+              >
+                <span>{bot.name}</span>
+                <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+              </a>
+            ))}
+          </div>
         </div>
       </div>
 

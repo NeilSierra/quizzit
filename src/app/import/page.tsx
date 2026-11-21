@@ -82,9 +82,10 @@ export default function ImportPage() {
                 Choice, Identification, and Enumeration questions.
               </p>
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="grid grid-cols-1 sm:flex sm:flex-wrap gap-3">
               <Button
                 variant="secondary"
+                className="w-full sm:w-auto"
                 onClick={() =>
                   downloadTextFile(
                     "quizzit-template.json",
@@ -98,6 +99,7 @@ export default function ImportPage() {
               </Button>
               <Button
                 variant="secondary"
+                className="w-full sm:w-auto"
                 onClick={() =>
                   downloadTextFile(
                     "quizzit-template.csv",

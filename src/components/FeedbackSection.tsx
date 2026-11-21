@@ -142,20 +142,20 @@ export function FeedbackSection() {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-3 w-full sm:w-auto">
           <motion.button
             type="button"
             whileTap={{ scale: 0.92 }}
             onClick={toggleLike}
             aria-pressed={liked}
-            className={`focus-ring inline-flex min-h-[52px] items-center gap-2.5 rounded-2xl border-2 px-5 font-extrabold text-sm uppercase tracking-wide transition-colors ${
+            className={`focus-ring inline-flex min-h-[52px] w-full sm:w-auto items-center justify-center gap-2 rounded-2xl border-2 px-4 sm:px-5 font-extrabold text-sm uppercase tracking-wide transition-colors ${
               liked
                 ? "border-danger bg-danger-bg text-danger shadow-[0_3px_0_var(--danger)]"
                 : "border-border bg-surface text-text shadow-[0_3px_0_var(--border)] hover:border-border-strong"
             }`}
           >
             <Heart
-              className={`h-5 w-5 ${liked ? "fill-danger text-danger" : ""}`}
+              className={`h-5 w-5 shrink-0 ${liked ? "fill-danger text-danger" : ""}`}
             />
             <span>{liked ? "Liked" : "Like"}</span>
             <span className="rounded-full bg-bg-subtle px-2 py-0.5 text-xs font-extrabold tabular-nums text-text">
@@ -165,6 +165,7 @@ export function FeedbackSection() {
 
           <Button
             variant="secondary"
+            className="w-full sm:w-auto"
             onClick={() => {
               setSubmitted(false);
               setError(null);
@@ -172,7 +173,7 @@ export function FeedbackSection() {
               setFeedbackOpen(true);
             }}
           >
-            <MessageSquare className="h-4 w-4" />
+            <MessageSquare className="h-4 w-4 shrink-0" />
             Feedback
           </Button>
         </div>
