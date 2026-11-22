@@ -287,6 +287,16 @@ export function AppShell({ children }: { children: ReactNode }) {
               {APP_VERSION}
             </span>
           </button>
+
+          {!collapsed && (
+            <Link
+              href="/settings#about-creator"
+              onClick={() => sound.playClick()}
+              className="px-2 pt-0.5 text-center text-[11px] font-bold text-text-faint hover:text-brand-text transition-colors"
+            >
+              Made by @NeilSierra · About
+            </Link>
+          )}
         </div>
       </aside>
 
@@ -496,6 +506,18 @@ export function AppShell({ children }: { children: ReactNode }) {
               </ul>
             </Card>
           ))}
+          <div className="pt-1 text-center">
+            <Link
+              href="/settings#about-creator"
+              onClick={() => {
+                sound.playClick();
+                setShowPatchNotes(false);
+              }}
+              className="text-xs font-bold text-text-faint hover:text-brand-text transition-colors"
+            >
+              About the Creator · @NeilSierra
+            </Link>
+          </div>
         </div>
       </Modal>
       <AuthModal />

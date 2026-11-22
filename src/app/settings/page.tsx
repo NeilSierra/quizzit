@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Cloud, Download, Lock, LogIn, LogOut, Trash2, Upload } from "lucide-react";
+import { Cloud, Download, ExternalLink, Lock, LogIn, LogOut, Trash2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Modal } from "@/components/ui/Modal";
@@ -310,6 +310,58 @@ export default function SettingsPage() {
               : `Show Older (${PATCH_NOTES.length - 3})`}
           </Button>
         )}
+      </section>
+
+      {/* About the Creator */}
+      <section id="about-creator" className="flex flex-col gap-3 scroll-mt-20">
+        <h2 className="text-2xl font-extrabold text-text">About the Creator</h2>
+        <Card className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <img
+                src="/mascot/wave.png"
+                alt="Quizzit mascot waving"
+                className="h-16 w-16 shrink-0 rounded-2xl border-2 border-border bg-brand-tint/40 p-1 object-contain"
+              />
+              <div className="flex flex-col gap-0.5">
+                <h3 className="text-lg font-extrabold text-text leading-tight">
+                  Neil Sierra
+                </h3>
+                <p className="text-sm font-bold text-brand-text">
+                  @NeilSierra · Developer &amp; Creator of Quizzit
+                </p>
+              </div>
+            </div>
+            <a
+              href="https://github.com/NeilSierra"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto shrink-0"
+            >
+              <Button variant="secondary" className="w-full sm:w-auto">
+                <ExternalLink className="h-4 w-4" />
+                GitHub Profile
+              </Button>
+            </a>
+          </div>
+
+          <p className="text-sm font-semibold text-text-muted leading-relaxed">
+            Built Quizzit to be a fast, distraction-free study and quiz PWA so
+            anyone can turn their own notes, CSVs, and JSON files into
+            interactive practice sessions — online or offline.
+          </p>
+
+          <div className="flex flex-wrap gap-2">
+            {["Next.js", "Tailwind", "Supabase", "PWA"].map((tech) => (
+              <span
+                key={tech}
+                className="rounded-full bg-brand-tint px-3 py-1 text-xs font-extrabold text-brand-text"
+              >
+                {tech}
+              </span>
+            ))}
+          </div>
+        </Card>
       </section>
 
       <Modal

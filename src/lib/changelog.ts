@@ -1,4 +1,4 @@
-export const APP_VERSION = "v3.3";
+export const APP_VERSION = "v3.4";
 
 export interface PatchNote {
   version: string;
@@ -8,6 +8,15 @@ export interface PatchNote {
 }
 
 export const PATCH_NOTES: PatchNote[] = [
+  {
+    version: "v3.4",
+    date: "2026-11-22",
+    title: "About the Creator & Browser Favicon Fix",
+    changes: [
+      "Added an About the Creator section in Settings featuring @NeilSierra, Quizzit's story, tech stack pills, and a GitHub profile link, plus a quick footer link in the sidebar and Patch Notes modal.",
+      "Added an explicit multi-size favicon.ico and <link rel=\"icon\"> metadata tags so the Quizzit icon displays reliably in all browser tabs.",
+    ],
+  },
   {
     version: "v3.3",
     date: "2026-11-22",
