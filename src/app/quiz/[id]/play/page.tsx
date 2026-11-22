@@ -475,40 +475,45 @@ export default function QuizPlayPage() {
             transition={{ type: "spring", stiffness: 520, damping: 32 }}
             className="flex flex-col gap-6"
           >
-            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 text-xs font-extrabold uppercase tracking-wider text-text-muted">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="whitespace-nowrap">
-                  Question {currentIndex + 1} of {questions.length}
-                </span>
-                {settings.redemptionIds?.includes(currentQuestion.id) && (
-                  <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border border-warning/40 bg-warning/15 px-2 py-0.5 text-[10px] font-extrabold text-warning">
-                    <RotateCcw className="h-3 w-3 shrink-0" aria-hidden="true" />
-                    Redemption
+            <div className="flex flex-col gap-3">
+              {/* Row 1 (mobile): Question counter + Question Type | Row 2 (mobile): Hint button */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div className="flex flex-wrap items-center justify-between sm:justify-start gap-2 w-full sm:w-auto">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="whitespace-nowrap text-xs font-extrabold uppercase tracking-wider text-text-muted">
+                      Question {currentIndex + 1} of {questions.length}
+                    </span>
+                    {settings.redemptionIds?.includes(currentQuestion.id) && (
+                      <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border border-warning/40 bg-warning/15 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-warning">
+                        <RotateCcw className="h-3 w-3 shrink-0" aria-hidden="true" />
+                        Redemption
+                      </span>
+                    )}
+                  </div>
+
+                  <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-border bg-bg-subtle px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wider text-text-muted">
+                    <QuestionTypeIcon type={currentQuestion.type} className="h-3.5 w-3.5 shrink-0" />
+                    <span>{currentQuestion.type.replace("_", " ")}</span>
                   </span>
-                )}
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-                  <QuestionTypeIcon type={currentQuestion.type} className="h-3.5 w-3.5 shrink-0" />
-                  <span>{currentQuestion.type.replace("_", " ")}</span>
-                </span>
+                </div>
+
                 {!checkedAnswer && (
                   <motion.button
                     type="button"
                     whileTap={{ scale: 0.94 }}
                     onClick={handleHint}
-                    className="focus-ring inline-flex min-h-9 sm:min-h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border-2 border-info/50 bg-info/10 px-3 sm:px-3.5 py-1 text-xs sm:text-sm font-extrabold text-info hover:bg-info/20 transition-colors"
+                    className="focus-ring inline-flex min-h-9 self-start sm:self-auto shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border-2 border-info/50 bg-info/10 px-3.5 py-1 text-xs sm:text-sm font-extrabold text-info hover:bg-info/20 transition-colors"
                   >
                     <Lightbulb className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
                     Hint
                   </motion.button>
                 )}
               </div>
-            </div>
 
-            <h1 className="text-xl sm:text-[26px] font-extrabold text-text leading-snug break-words">
-              {currentQuestion.prompt}
-            </h1>
+              <h1 className="text-xl sm:text-[26px] font-extrabold text-text leading-snug break-words">
+                {currentQuestion.prompt}
+              </h1>
+            </div>
 
             {hintText && (
               <div
@@ -516,7 +521,7 @@ export default function QuizPlayPage() {
                 className="flex items-start gap-2.5 rounded-2xl border-2 border-info/50 bg-info/10 px-4 py-3 text-sm font-bold text-text"
               >
                 <Lightbulb className="h-4 w-4 shrink-0 text-info mt-0.5" />
-                <span className="font-mono">{hintText}</span>
+                <span className="break-words">{hintText}</span>
               </div>
             )}
 
@@ -561,106 +566,106 @@ export default function QuizPlayPage() {
           </motion.div>
         </AnimatePresence>
 
-          {/* Action Footer (when feedback panel is not shown) */}
-          {!checkedAnswer && (
-            <div className="mt-8 flex items-center justify-between gap-3">
-              {isImmediate ? (
+        {/* Action Footer (when feedback panel is not shown) */}
+        {!checkedAnswer && (
+          <div className="mt-8 flex items-center justify-between gap-3">
+            {isImmediate ? (
+              <Button
+                variant="primary"
+                fullWidth
+                silent
+                disabled={!hasDraft}
+                onClick={handleCheckImmediate}
+              >
+                Check
+              </Button>
+            ) : (
+              <>
+                <Button
+                  variant="secondary"
+                  silent
+                  disabled={currentIndex === 0}
+                  onClick={handleEndPrev}
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Prev
+                </Button>
                 <Button
                   variant="primary"
-                  fullWidth
                   silent
-                  disabled={!hasDraft}
-                  onClick={handleCheckImmediate}
+                  onClick={handleEndNext}
+                  className="flex-1 sm:flex-initial"
                 >
-                  Check
+                  {currentIndex + 1 >= questions.length ? (
+                    "Finish"
+                  ) : (
+                    <>
+                      Next
+                      <ArrowRight className="h-4 w-4" />
+                    </>
+                  )}
                 </Button>
-              ) : (
-                <>
-                  <Button
-                    variant="secondary"
-                    silent
-                    disabled={currentIndex === 0}
-                    onClick={handleEndPrev}
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                    Prev
-                  </Button>
-                  <Button
-                    variant="primary"
-                    silent
-                    onClick={handleEndNext}
-                    className="flex-1 sm:flex-initial"
-                  >
-                    {currentIndex + 1 >= questions.length ? (
-                      "Finish"
-                    ) : (
-                      <>
-                        Next
-                        <ArrowRight className="h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
-                </>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Immediate Feedback Banner */}
-        {isImmediate && checkedAnswer && (
-          <FeedbackPanel
-            question={currentQuestion}
-            answer={checkedAnswer}
-            isLast={currentIndex + 1 >= questions.length}
-            onContinue={handleContinueImmediate}
-          />
+              </>
+            )}
+          </div>
         )}
-
-        {/* Unanswered Confirmation Modal (end mode) */}
-        <Modal
-          open={confirmUnanswered}
-          onClose={() => setConfirmUnanswered(false)}
-          title="Finish with unanswered questions?"
-        >
-          <div className="flex flex-col gap-4">
-            <p className="text-base font-semibold text-text-muted">
-              You still have unanswered questions. Submit anyway?
-            </p>
-            <div className="flex justify-end gap-2">
-              <Button
-                variant="secondary"
-                onClick={() => setConfirmUnanswered(false)}
-              >
-                Keep Reviewing
-              </Button>
-              <Button variant="primary" onClick={handleComplete}>
-                Submit Quiz
-              </Button>
-            </div>
-          </div>
-        </Modal>
-
-        {/* Exit Confirmation Modal */}
-        <Modal
-          open={confirmExit}
-          onClose={() => setConfirmExit(false)}
-          title="Leave quiz?"
-        >
-          <div className="flex flex-col gap-4">
-            <p className="text-base font-semibold text-text-muted">
-              Your progress is saved automatically. You can resume later from the
-              Home screen.
-            </p>
-            <div className="flex justify-end gap-2">
-              <Button variant="secondary" onClick={() => setConfirmExit(false)}>
-                Stay
-              </Button>
-              <Button variant="danger" onClick={() => router.push("/library")}>
-                Leave Quiz
-              </Button>
-            </div>
-          </div>
-        </Modal>
       </div>
-      );
+
+      {/* Immediate Feedback Banner */}
+      {isImmediate && checkedAnswer && (
+        <FeedbackPanel
+          question={currentQuestion}
+          answer={checkedAnswer}
+          isLast={currentIndex + 1 >= questions.length}
+          onContinue={handleContinueImmediate}
+        />
+      )}
+
+      {/* Unanswered Confirmation Modal (end mode) */}
+      <Modal
+        open={confirmUnanswered}
+        onClose={() => setConfirmUnanswered(false)}
+        title="Finish with unanswered questions?"
+      >
+        <div className="flex flex-col gap-4">
+          <p className="text-base font-semibold text-text-muted">
+            You still have unanswered questions. Submit anyway?
+          </p>
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="secondary"
+              onClick={() => setConfirmUnanswered(false)}
+            >
+              Keep Reviewing
+            </Button>
+            <Button variant="primary" onClick={handleComplete}>
+              Submit Quiz
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Exit Confirmation Modal */}
+      <Modal
+        open={confirmExit}
+        onClose={() => setConfirmExit(false)}
+        title="Leave quiz?"
+      >
+        <div className="flex flex-col gap-4">
+          <p className="text-base font-semibold text-text-muted">
+            Your progress is saved automatically. You can resume later from the
+            Home screen.
+          </p>
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" onClick={() => setConfirmExit(false)}>
+              Stay
+            </Button>
+            <Button variant="danger" onClick={() => router.push("/library")}>
+              Leave Quiz
+            </Button>
+          </div>
+        </div>
+      </Modal>
+    </div>
+  );
 }

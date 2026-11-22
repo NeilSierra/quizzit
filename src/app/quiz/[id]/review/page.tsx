@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ArrowLeft, CheckCircle2, XCircle } from "lucide-react";
+import { QuestionTypeIcon } from "@/components/QuestionTypeIcon";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { sound } from "@/lib/sound";
@@ -134,22 +135,28 @@ export default function ReviewPage() {
                   isCorrect ? "border-success/60" : "border-danger/60"
                 }`}
               >
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex flex-col gap-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-border bg-bg-subtle px-2.5 py-0.5 text-[11px] font-extrabold uppercase tracking-wider text-text-muted">
+                      <QuestionTypeIcon type={q.type} className="h-3 w-3 shrink-0" />
+                      <span>{q.type.replace("_", " ")}</span>
+                    </span>
+                    {ans && !ans.isCorrect && ans.score > 0 && (
+                      <span className="shrink-0 whitespace-nowrap rounded-full bg-brand-tint px-2.5 py-0.5 text-xs font-extrabold text-brand-text">
+                        {Math.round(ans.score * 100)}%
+                      </span>
+                    )}
+                  </div>
                   <div className="flex items-start gap-2.5">
                     {isCorrect ? (
-                      <CheckCircle2 className="h-6 w-6 shrink-0 text-success mt-0.5" />
+                      <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6 shrink-0 text-success mt-0.5" />
                     ) : (
-                      <XCircle className="h-6 w-6 shrink-0 text-danger mt-0.5" />
+                      <XCircle className="h-5 w-5 sm:h-6 sm:w-6 shrink-0 text-danger mt-0.5" />
                     )}
-                    <h2 className="text-lg font-extrabold text-text">
+                    <h2 className="text-base sm:text-lg font-extrabold text-text break-words">
                       {idx + 1}. {q.prompt}
                     </h2>
                   </div>
-                  {ans && !ans.isCorrect && ans.score > 0 && (
-                    <span className="shrink-0 rounded-full bg-brand-tint px-2.5 py-0.5 text-xs font-extrabold text-brand-text">
-                      {Math.round(ans.score * 100)}%
-                    </span>
-                  )}
                 </div>
 
                 <div className="rounded-xl bg-bg-subtle p-3.5 text-sm space-y-1.5">
