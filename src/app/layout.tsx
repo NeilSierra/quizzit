@@ -26,6 +26,11 @@ export const metadata: Metadata = {
     title: "Quizzit",
   },
   icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "500x500" },
+    ],
+    shortcut: "/favicon.ico",
     apple: "/icons/apple-touch-icon.png",
   },
   openGraph: {

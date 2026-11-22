@@ -11,6 +11,7 @@ const PRECACHE_URLS = [
   "/quiz/offline/results",
   "/quiz/offline/review",
   "/icon.png",
+  "/favicon.ico",
   "/icons/icon-192.png",
   "/icons/icon-512.png",
   "/icons/icon-maskable-512.png",
@@ -96,6 +97,7 @@ self.addEventListener("fetch", (event) => {
     url.pathname.startsWith("/mascot/") ||
     url.pathname.startsWith("/icons/") ||
     url.pathname === "/icon.png" ||
+    url.pathname === "/favicon.ico" ||
     url.pathname === "/manifest.webmanifest"
   ) {
     event.respondWith(
