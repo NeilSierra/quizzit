@@ -144,7 +144,7 @@ export default function LibraryPage() {
           </p>
         </div>
         <Link href="/import" className="w-full sm:w-auto">
-          <Button variant="primary" className="w-full sm:w-auto">
+          <Button variant="accent" className="w-full sm:w-auto">
             <Upload className="h-4 w-4" />
             Import Quiz
           </Button>
@@ -152,7 +152,7 @@ export default function LibraryPage() {
       </div>
 
       {quizSets.length === 0 ? (
-        <Card className="flex flex-col items-center justify-center gap-4 py-12 text-center">
+        <Card elevation="hero" className="flex flex-col items-center justify-center gap-4 py-12 text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-tint text-brand-text">
             <BookOpen className="h-8 w-8" />
           </div>
@@ -167,12 +167,12 @@ export default function LibraryPage() {
           </div>
           <div className="flex flex-wrap justify-center gap-3 pt-2">
             <Link href="/import">
-              <Button variant="primary">
+              <Button variant="accent">
                 <Upload className="h-4 w-4" />
                 Import a File
               </Button>
             </Link>
-            <Button variant="secondary" onClick={() => importSampleQuiz()}>
+            <Button variant="primary" onClick={() => importSampleQuiz()}>
               <Sparkles className="h-4 w-4" />
               Load Sample Quiz
             </Button>
@@ -431,7 +431,7 @@ export default function LibraryPage() {
                       <div className="relative flex items-center gap-1.5 shrink-0">
                         <Link href={`/quiz/${quiz.id}/setup`}>
                           <Button
-                            variant="primary"
+                            variant="accent"
                             aria-label={`Start ${quiz.title}`}
                             title="Start quiz"
                             className="!min-h-12 h-12 !w-12 !px-0"

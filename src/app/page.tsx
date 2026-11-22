@@ -41,7 +41,10 @@ export default function HomePage() {
     <div className="flex flex-col gap-8">
       {/* Resume in-progress banner */}
       {pendingResume && (
-        <Card className="border-brand-fill bg-brand-tint flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <Card
+          elevation="hero"
+          className="border-brand-fill bg-brand-tint flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+        >
           <div>
             <p className="text-xs font-extrabold uppercase tracking-wider text-brand-text">
               Quiz in progress
@@ -63,7 +66,7 @@ export default function HomePage() {
               Discard
             </Button>
             <Button
-              variant="primary"
+              variant="accent"
               onClick={handleResume}
               className="w-full sm:w-auto"
             >
@@ -86,7 +89,7 @@ export default function HomePage() {
       </div>
 
       {/* Hero */}
-      <Card className="p-6 sm:p-8 flex flex-col gap-6">
+      <Card elevation="hero" className="p-6 sm:p-8 flex flex-col gap-6">
         <div className="flex flex-col gap-3 max-w-2xl">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-text tracking-tight leading-tight">
             Bring your own questions. Master every topic.
@@ -99,14 +102,14 @@ export default function HomePage() {
 
         <div className="flex flex-col sm:flex-row flex-wrap gap-3">
           <Link href="/import" className="w-full sm:w-auto">
-            <Button variant="primary" className="w-full sm:w-auto">
+            <Button variant="accent" className="w-full sm:w-auto">
               <Upload className="h-4 w-4" />
               Import a Quiz
             </Button>
           </Link>
           {quizSets.length === 0 ? (
             <Button
-              variant="secondary"
+              variant="primary"
               className="w-full sm:w-auto"
               onClick={() => {
                 const sample = importSampleQuiz();
@@ -118,7 +121,7 @@ export default function HomePage() {
             </Button>
           ) : (
             <Link href="/library" className="w-full sm:w-auto">
-              <Button variant="secondary" className="w-full sm:w-auto">
+              <Button variant="primary" className="w-full sm:w-auto">
                 <BookOpen className="h-4 w-4" />
                 Open Library
               </Button>
@@ -200,7 +203,7 @@ export default function HomePage() {
                   </p>
                 </div>
                 <Link href={`/quiz/${quiz.id}/setup`} className="shrink-0">
-                  <Button variant="primary">
+                  <Button variant="accent">
                     <Play className="h-4 w-4 fill-current" />
                     Start
                   </Button>

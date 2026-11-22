@@ -28,7 +28,7 @@ export default function HelpPage() {
           </p>
         </div>
         <Link href="/import" className="w-full sm:w-auto shrink-0">
-          <Button variant="primary" className="w-full sm:w-auto">
+          <Button variant="accent" className="w-full sm:w-auto">
             <Upload className="h-4 w-4" />
             Go to Import
           </Button>

@@ -11,6 +11,13 @@
   --brand-tint: #DCEBF5;
   --on-brand: #FFFFFF;
 
+  --accent: #C3871C;
+  --accent-hover: #D49626;
+  --accent-edge: #8E6112;
+  --accent-tint: #FBF1DC;
+  --accent-text: #8E6112;
+  --on-accent: #1C160B;
+
   --bg: #F8FAFC;
   --bg-subtle: #EDF2F7;
   --surface: #FFFFFF;
@@ -59,6 +66,13 @@
     --brand-text: #6DB0DC;
     --brand-tint: #1B3446;
 
+    --accent: #D99B26;
+    --accent-hover: #E5AA38;
+    --accent-edge: #9A6C14;
+    --accent-tint: #332610;
+    --accent-text: #F0B94D;
+    --on-accent: #181308;
+
     --bg: #131F24;
     --bg-subtle: #0F191D;
     --surface: #202F36;
@@ -91,6 +105,13 @@
   --brand-text: #6DB0DC;
   --brand-tint: #1B3446;
 
+  --accent: #D99B26;
+  --accent-hover: #E5AA38;
+  --accent-edge: #9A6C14;
+  --accent-tint: #332610;
+  --accent-text: #F0B94D;
+  --on-accent: #181308;
+
   --bg: #131F24;
   --bg-subtle: #0F191D;
   --surface: #202F36;
@@ -122,6 +143,13 @@
   --color-brand-text: var(--brand-text);
   --color-brand-tint: var(--brand-tint);
   --color-on-brand: var(--on-brand);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-edge: var(--accent-edge);
+  --color-accent-tint: var(--accent-tint);
+  --color-accent-text: var(--accent-text);
+  --color-on-accent: var(--on-accent);
 
   --color-bg: var(--bg);
   --color-bg-subtle: var(--bg-subtle);
@@ -206,6 +234,21 @@ body {
 .btn-primary:active:not(:disabled) {
   transform: translateY(4px) scale(0.985);
   box-shadow: 0 0 0 var(--brand-edge);
+}
+
+.btn-accent {
+  background-color: var(--accent);
+  color: var(--on-accent);
+  box-shadow: 0 4px 0 var(--accent-edge);
+}
+.btn-accent:hover:not(:disabled) {
+  background-color: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 var(--accent-edge);
+}
+.btn-accent:active:not(:disabled) {
+  transform: translateY(4px) scale(0.985);
+  box-shadow: 0 0 0 var(--accent-edge);
 }
 
 .btn-secondary {

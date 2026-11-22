@@ -159,7 +159,7 @@ export default function SettingsPage() {
           <div className="flex flex-wrap items-center gap-2">
             {user && !isOffline && pendingSyncCount > 0 && (
               <Button
-                variant="primary"
+                variant="accent"
                 disabled={syncing}
                 onClick={() => void syncOfflineQueue()}
               >

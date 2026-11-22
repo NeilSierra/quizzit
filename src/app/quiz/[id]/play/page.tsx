@@ -571,7 +571,7 @@ export default function QuizPlayPage() {
           <div className="mt-8 flex items-center justify-between gap-3">
             {isImmediate ? (
               <Button
-                variant="primary"
+                variant="accent"
                 fullWidth
                 silent
                 disabled={!hasDraft}
@@ -591,7 +591,9 @@ export default function QuizPlayPage() {
                   Prev
                 </Button>
                 <Button
-                  variant="primary"
+                  variant={
+                    currentIndex + 1 >= questions.length ? "accent" : "primary"
+                  }
                   silent
                   onClick={handleEndNext}
                   className="flex-1 sm:flex-initial"

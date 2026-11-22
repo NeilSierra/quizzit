@@ -1,4 +1,4 @@
-export const APP_VERSION = "v3.6";
+export const APP_VERSION = "v3.7";
 
 export interface PatchNote {
   version: string;
@@ -8,6 +8,16 @@ export interface PatchNote {
 }
 
 export const PATCH_NOTES: PatchNote[] = [
+  {
+    version: "v3.7",
+    date: "2026-11-22",
+    title: "Visual Hierarchy & #C3871C Accent System",
+    changes: [
+      "Added a dedicated #C3871C warm amber accent button variant with high-contrast dark ink and 3D tactile press physics for key CTAs (Start/Play, Resume, Import, Check, Finish, Continue, and Sync Now).",
+      "Refined visual hierarchy across Home, Library, History, Settings, Help, and all Quiz screens with elevated hero cards, section count pills, and clearer primary vs. secondary action weight.",
+      "Redesigned the quiz play and review question headers so Question X of Y and Question Type sit cleanly on row 1 with Hint on row 2 on small screens.",
+    ],
+  },
   {
     version: "v3.6",
     date: "2026-11-22",

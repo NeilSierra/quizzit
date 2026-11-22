@@ -446,7 +446,7 @@ export default function QuizSetupPage() {
       </Card>
 
       <Button
-        variant="primary"
+        variant="accent"
         fullWidth
         silent
         disabled={matchingCount === 0}

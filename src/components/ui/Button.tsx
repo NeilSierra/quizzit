@@ -5,6 +5,7 @@ import { sound } from "@/lib/sound";
 
 export type ButtonVariant =
   | "primary"
+  | "accent"
   | "secondary"
   | "success"
   | "danger"
@@ -19,6 +20,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClass: Record<ButtonVariant, string> = {
   primary: "btn-primary",
+  accent: "btn-accent",
   secondary: "btn-secondary",
   success: "btn-success",
   danger: "btn-danger",

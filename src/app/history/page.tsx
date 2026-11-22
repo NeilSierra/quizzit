@@ -1,6 +1,8 @@
 "use client";
 
-import { Award } from "lucide-react";
+import Link from "next/link";
+import { Award, BookOpen } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { ALL_BADGES } from "@/lib/badges";
 import { useLibrary } from "@/store/useLibrary";
@@ -29,9 +31,14 @@ export default function HistoryPage() {
 
       {/* Badges */}
       <section className="flex flex-col gap-3">
-        <div className="flex items-center gap-2">
-          <Award className="h-6 w-6 text-xp" />
-          <h2 className="text-2xl font-extrabold text-text">Badges</h2>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Award className="h-6 w-6 text-xp" />
+            <h2 className="text-2xl font-extrabold text-text">Badges</h2>
+          </div>
+          <span className="rounded-full bg-accent-tint px-3 py-1 text-xs font-extrabold text-accent-text">
+            {stats.unlockedBadges.length} / {ALL_BADGES.length} unlocked
+          </span>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {ALL_BADGES.map((badge) => {
@@ -60,10 +67,25 @@ export default function HistoryPage() {
 
       {/* Recent Attempts */}
       <section className="flex flex-col gap-3">
-        <h2 className="text-2xl font-extrabold text-text">Past Attempts</h2>
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="text-2xl font-extrabold text-text">Past Attempts</h2>
+          {attempts.length > 0 && (
+            <span className="rounded-full bg-brand-tint px-3 py-1 text-xs font-extrabold text-brand-text">
+              {attempts.length} total
+            </span>
+          )}
+        </div>
         {attempts.length === 0 ? (
-          <Card className="py-8 text-center text-text-muted font-semibold">
-            No completed quizzes yet. Finish a quiz to see your history here!
+          <Card elevation="subtle" className="py-10 text-center flex flex-col items-center gap-4">
+            <p className="text-text-muted font-semibold">
+              No completed quizzes yet. Finish a quiz to see your history here!
+            </p>
+            <Link href="/library">
+              <Button variant="accent">
+                <BookOpen className="h-4 w-4" />
+                Go to Library
+              </Button>
+            </Link>
           </Card>
         ) : (
           <div className="flex flex-col gap-3">

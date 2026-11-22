@@ -190,7 +190,7 @@ export default function ResultsPage() {
   return (
     <div className="mx-auto max-w-[600px] flex flex-col gap-6">
       {/* Celebration Hero */}
-      <Card className="flex flex-col items-center gap-4 py-8 text-center">
+      <Card elevation="hero" className="flex flex-col items-center gap-4 py-8 text-center">
         <motion.img
           src={
             attempt.accuracy >= 50
@@ -324,7 +324,7 @@ export default function ResultsPage() {
       <div className="flex flex-col gap-3">
         {continuePool.length > 0 && (
           <Button
-            variant="primary"
+            variant="accent"
             fullWidth
             silent
             onClick={handleContinueRemaining}
@@ -336,7 +336,7 @@ export default function ResultsPage() {
 
         <Link href={`/quiz/${id}/review`}>
           <Button
-            variant={continuePool.length > 0 ? "secondary" : "primary"}
+            variant={continuePool.length > 0 ? "primary" : "accent"}
             fullWidth
           >
             Review Answers
