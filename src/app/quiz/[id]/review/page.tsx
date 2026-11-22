@@ -67,17 +67,17 @@ export default function ReviewPage() {
   return (
     <div className="mx-auto max-w-2xl flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 min-w-0">
           <Link
             href={`/quiz/${id}/results`}
             aria-label="Back to results"
-            className="focus-ring flex h-10 w-10 items-center justify-center rounded-xl border-2 border-border bg-surface text-text-muted hover:text-text"
+            className="focus-ring flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-2 border-border bg-surface text-text-muted hover:text-text"
           >
             <ArrowLeft className="h-5 w-5" />
           </Link>
-          <div>
-            <h1 className="text-2xl font-extrabold text-text">Answer Review</h1>
-            <p className="text-sm font-semibold text-text-muted">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl sm:text-2xl font-extrabold text-text whitespace-nowrap">Answer Review</h1>
+            <p className="text-sm font-semibold text-text-muted truncate">
               {attempt.quizTitle} &bull; {attempt.accuracy}%
             </p>
           </div>

@@ -475,21 +475,21 @@ export default function QuizPlayPage() {
             transition={{ type: "spring", stiffness: 520, damping: 32 }}
             className="flex flex-col gap-6"
           >
-            <div className="flex items-center justify-between gap-2 text-xs font-extrabold uppercase tracking-wider text-text-muted">
-              <div className="flex items-center gap-2">
-                <span>
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 text-xs font-extrabold uppercase tracking-wider text-text-muted">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="whitespace-nowrap">
                   Question {currentIndex + 1} of {questions.length}
                 </span>
                 {settings.redemptionIds?.includes(currentQuestion.id) && (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-warning/40 bg-warning/15 px-2 py-0.5 text-[10px] font-extrabold text-warning">
-                    <RotateCcw className="h-3 w-3" aria-hidden="true" />
+                  <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border border-warning/40 bg-warning/15 px-2 py-0.5 text-[10px] font-extrabold text-warning">
+                    <RotateCcw className="h-3 w-3 shrink-0" aria-hidden="true" />
                     Redemption
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5">
-                  <QuestionTypeIcon type={currentQuestion.type} className="h-3.5 w-3.5" />
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+                  <QuestionTypeIcon type={currentQuestion.type} className="h-3.5 w-3.5 shrink-0" />
                   <span>{currentQuestion.type.replace("_", " ")}</span>
                 </span>
                 {!checkedAnswer && (
@@ -497,16 +497,16 @@ export default function QuizPlayPage() {
                     type="button"
                     whileTap={{ scale: 0.94 }}
                     onClick={handleHint}
-                    className="focus-ring inline-flex min-h-11 items-center gap-1.5 rounded-full border-2 border-info/50 bg-info/10 px-4 py-1.5 text-sm font-extrabold text-info hover:bg-info/20 transition-colors"
+                    className="focus-ring inline-flex min-h-9 sm:min-h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border-2 border-info/50 bg-info/10 px-3 sm:px-3.5 py-1 text-xs sm:text-sm font-extrabold text-info hover:bg-info/20 transition-colors"
                   >
-                    <Lightbulb className="h-4 w-4" />
+                    <Lightbulb className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
                     Hint
                   </motion.button>
                 )}
               </div>
             </div>
 
-            <h1 className="text-2xl sm:text-[26px] font-extrabold text-text leading-snug">
+            <h1 className="text-xl sm:text-[26px] font-extrabold text-text leading-snug break-words">
               {currentQuestion.prompt}
             </h1>
 

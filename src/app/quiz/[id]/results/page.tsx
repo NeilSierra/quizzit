@@ -209,8 +209,8 @@ export default function ResultsPage() {
         />
         <ScoreRing target={attempt.accuracy} />
         <div className="max-w-md px-2">
-          <h1 className="text-3xl font-extrabold text-text">{tier.title}</h1>
-          <p className="mt-1 text-base font-semibold text-text-muted">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-text">{tier.title}</h1>
+          <p className="mt-1 text-sm sm:text-base font-semibold text-text-muted">
             {tier.subtitle}
           </p>
         </div>
@@ -231,7 +231,7 @@ export default function ResultsPage() {
       <div className="grid grid-cols-3 gap-2 sm:gap-3">
         <Card className="flex flex-col items-center text-center gap-1 p-3 sm:py-4">
           <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6 text-success" />
-          <div className="text-base sm:text-xl font-extrabold text-text">
+          <div className="text-base sm:text-xl font-extrabold text-text whitespace-nowrap">
             {Number(attempt.totalScore.toFixed(1))} / {questions.length}
           </div>
           <div className="text-[11px] sm:text-xs font-bold uppercase tracking-wide text-text-muted">
@@ -241,7 +241,7 @@ export default function ResultsPage() {
 
         <Card className="flex flex-col items-center text-center gap-1 p-3 sm:py-4">
           <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-brand-text" />
-          <div className="text-base sm:text-xl font-extrabold text-text">
+          <div className="text-base sm:text-xl font-extrabold text-text whitespace-nowrap">
             {formatDuration(attempt.finishedAt - attempt.startedAt)}
           </div>
           <div className="text-[11px] sm:text-xs font-bold uppercase tracking-wide text-text-muted">

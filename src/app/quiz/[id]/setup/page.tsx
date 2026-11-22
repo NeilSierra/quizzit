@@ -155,12 +155,12 @@ export default function QuizSetupPage() {
         <Link
           href="/library"
           aria-label="Back to library"
-          className="focus-ring flex h-10 w-10 items-center justify-center rounded-xl border-2 border-border bg-surface text-text-muted hover:text-text"
+          className="focus-ring flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-2 border-border bg-surface text-text-muted hover:text-text"
         >
           <ArrowLeft className="h-5 w-5" />
         </Link>
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-text leading-tight">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-xl sm:text-3xl font-extrabold text-text leading-tight break-words">
             {quizSet.title}
           </h1>
           <p className="text-sm font-semibold text-text-muted">
@@ -196,7 +196,7 @@ export default function QuizSetupPage() {
                   sound.playClick();
                   setTargetMode(mode.id);
                 }}
-                className={`focus-ring flex items-center justify-center gap-1.5 rounded-xl border-2 px-3 py-2.5 text-center text-xs font-extrabold uppercase tracking-wide transition-colors ${
+                className={`focus-ring flex items-center justify-center gap-1.5 rounded-xl border-2 px-2.5 sm:px-3 py-2.5 text-center text-[11px] sm:text-xs font-extrabold uppercase tracking-wide whitespace-nowrap transition-colors ${
                   active
                     ? "border-brand-fill bg-brand-tint text-brand-text"
                     : "border-border bg-surface text-text hover:border-border-strong"
