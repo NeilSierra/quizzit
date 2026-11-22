@@ -1,4 +1,4 @@
-export const APP_VERSION = "v3.2";
+export const APP_VERSION = "v3.3";
 
 export interface PatchNote {
   version: string;
@@ -8,6 +8,16 @@ export interface PatchNote {
 }
 
 export const PATCH_NOTES: PatchNote[] = [
+  {
+    version: "v3.3",
+    date: "2026-11-22",
+    title: "PWA App Icon & Mobile Adaptive Icon Fix",
+    changes: [
+      "Generated dedicated opaque 192x192, 512x512, maskable 512x512, and Apple Touch icons so the Quizzit logo no longer renders with a black background on Android or iOS home screens.",
+      "Added proper safe-zone padding to the maskable PWA icon so the mascot stays centered and unclipped inside adaptive icon shapes.",
+      "Updated the service worker precache and manifest to serve and cache the new PWA icon assets.",
+    ],
+  },
   {
     version: "v3.2",
     date: "2026-11-22",

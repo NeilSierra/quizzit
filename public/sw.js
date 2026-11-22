@@ -1,4 +1,4 @@
-const CACHE_NAME = "quizzit-pwa-v3-2";
+const CACHE_NAME = "quizzit-pwa-v3-3";
 const PRECACHE_URLS = [
   "/",
   "/library",
@@ -11,6 +11,10 @@ const PRECACHE_URLS = [
   "/quiz/offline/results",
   "/quiz/offline/review",
   "/icon.png",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
+  "/icons/icon-maskable-512.png",
+  "/icons/apple-touch-icon.png",
   "/manifest.webmanifest",
   "/mascot/logo.png",
   "/mascot/wave.png",
@@ -90,6 +94,7 @@ self.addEventListener("fetch", (event) => {
   if (
     url.pathname.startsWith("/_next/static/") ||
     url.pathname.startsWith("/mascot/") ||
+    url.pathname.startsWith("/icons/") ||
     url.pathname === "/icon.png" ||
     url.pathname === "/manifest.webmanifest"
   ) {

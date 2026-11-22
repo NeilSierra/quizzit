@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     title: "Quizzit",
   },
   icons: {
-    apple: "/mascot/logo.png",
+    apple: "/icons/apple-touch-icon.png",
   },
   openGraph: {
     title: "Quizzit",
