@@ -1,4 +1,4 @@
-export const APP_VERSION = "v3.4";
+export const APP_VERSION = "v3.5";
 
 export interface PatchNote {
   version: string;
@@ -8,6 +8,15 @@ export interface PatchNote {
 }
 
 export const PATCH_NOTES: PatchNote[] = [
+  {
+    version: "v3.5",
+    date: "2026-11-22",
+    title: "Library Search Filters & Easy Sample Quiz",
+    changes: [
+      "Added a Filter & Sort menu next to the Library search bar to filter quizzes by question type (Multiple Choice, Identification, Enumeration) or progress (Unplayed, Played) and sort by Newest, Title, Question Count, or Best Score.",
+      "Simplified the built-in sample quiz to Quick Start: Easy Trivia and cleaned up the Import and Settings pages.",
+    ],
+  },
   {
     version: "v3.4",
     date: "2026-11-22",

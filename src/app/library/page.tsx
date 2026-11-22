@@ -9,6 +9,7 @@ import {
   Pencil,
   Play,
   Search,
+  SlidersHorizontal,
   Sparkles,
   Trash2,
   Upload,
@@ -19,8 +20,12 @@ import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { sound } from "@/lib/sound";
-import type { QuizSet } from "@/lib/types";
+import type { QuestionType, QuizSet } from "@/lib/types";
 import { useLibrary } from "@/store/useLibrary";
+
+type TypeFilter = "all" | QuestionType;
+type StatusFilter = "all" | "unplayed" | "played";
+type SortOption = "newest" | "title" | "questions" | "best";
 
 export default function LibraryPage() {
   const quizSets = useLibrary((s) => s.quizSets);
@@ -31,25 +36,73 @@ export default function LibraryPage() {
   const importSampleQuiz = useLibrary((s) => s.importSampleQuiz);
 
   const [search, setSearch] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [renaming, setRenaming] = useState<QuizSet | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const [deleting, setDeleting] = useState<QuizSet | null>(null);
 
+  const activeFilterCount =
+    (typeFilter !== "all" ? 1 : 0) +
+    (statusFilter !== "all" ? 1 : 0) +
+    (sortBy !== "newest" ? 1 : 0);
+
+  const bestScoreByQuizId = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const a of attempts) {
+      const prev = map.get(a.quizSetId);
+      if (prev === undefined || a.accuracy > prev) {
+        map.set(a.quizSetId, a.accuracy);
+      }
+    }
+    return map;
+  }, [attempts]);
+
   const filteredQuizSets = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return quizSets;
-    return quizSets.filter(
-      (quiz) =>
-        quiz.title.toLowerCase().includes(q) ||
-        (quiz.description && quiz.description.toLowerCase().includes(q))
-    );
-  }, [quizSets, search]);
+    const filtered = quizSets.filter((quiz) => {
+      if (q) {
+        const matchesText =
+          quiz.title.toLowerCase().includes(q) ||
+          (quiz.description && quiz.description.toLowerCase().includes(q));
+        if (!matchesText) return false;
+      }
+      if (
+        typeFilter !== "all" &&
+        !quiz.questions.some((question) => question.type === typeFilter)
+      ) {
+        return false;
+      }
+      const hasAttempts = bestScoreByQuizId.has(quiz.id);
+      if (statusFilter === "unplayed" && hasAttempts) return false;
+      if (statusFilter === "played" && !hasAttempts) return false;
+      return true;
+    });
+
+    if (sortBy === "newest") return filtered;
+
+    return [...filtered].sort((a, b) => {
+      if (sortBy === "title") return a.title.localeCompare(b.title);
+      if (sortBy === "questions") return b.questions.length - a.questions.length;
+      const bestA = bestScoreByQuizId.get(a.id) ?? -1;
+      const bestB = bestScoreByQuizId.get(b.id) ?? -1;
+      return bestB - bestA;
+    });
+  }, [quizSets, search, typeFilter, statusFilter, sortBy, bestScoreByQuizId]);
+
+  const resetSearchAndFilters = () => {
+    sound.playClick();
+    setSearch("");
+    setTypeFilter("all");
+    setStatusFilter("all");
+    setSortBy("newest");
+  };
 
   const getBestScore = (quizId: string) => {
-    const matching = attempts.filter((a) => a.quizSetId === quizId);
-    if (matching.length === 0) return null;
-    return Math.max(...matching.map((a) => a.accuracy));
+    return bestScoreByQuizId.get(quizId) ?? null;
   };
 
   const handleExport = (quiz: QuizSet) => {
@@ -127,42 +180,186 @@ export default function LibraryPage() {
         </Card>
       ) : (
         <>
-          <div className="relative">
-            <Search
-              className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-text-muted"
-              aria-hidden="true"
-            />
-            <input
-              type="text"
-              inputMode="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search quizzes by title or description..."
-              aria-label="Search quizzes"
-              className="h-12 w-full rounded-2xl border-2 border-border bg-surface pl-11 pr-11 text-base font-semibold text-text placeholder:text-text-faint transition-colors focus:border-brand-fill focus:outline-none"
-            />
-            {search && (
+          <div className="flex flex-col gap-3">
+            <div className="flex gap-2">
+              <div className="relative flex-1 min-w-0">
+                <Search
+                  className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-text-muted"
+                  aria-hidden="true"
+                />
+                <input
+                  type="text"
+                  inputMode="search"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search quizzes by title or description..."
+                  aria-label="Search quizzes"
+                  className="h-12 w-full rounded-2xl border-2 border-border bg-surface pl-11 pr-11 text-base font-semibold text-text placeholder:text-text-faint transition-colors focus:border-brand-fill focus:outline-none"
+                />
+                {search && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      sound.playClick();
+                      setSearch("");
+                    }}
+                    aria-label="Clear search"
+                    className="focus-ring absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-xl text-text-muted hover:bg-bg-subtle hover:text-text"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+
               <button
                 type="button"
                 onClick={() => {
                   sound.playClick();
-                  setSearch("");
+                  setShowFilters((prev) => !prev);
                 }}
-                aria-label="Clear search"
-                className="focus-ring absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-xl text-text-muted hover:bg-bg-subtle hover:text-text"
+                aria-expanded={showFilters}
+                aria-label="Toggle search filters"
+                className={`focus-ring relative flex h-12 shrink-0 items-center justify-center gap-2 rounded-2xl border-2 px-3.5 text-sm font-extrabold transition-colors ${
+                  showFilters || activeFilterCount > 0
+                    ? "border-brand-fill bg-brand-tint text-brand-text"
+                    : "border-border bg-surface text-text-muted hover:border-border-strong hover:text-text"
+                }`}
               >
-                <X className="h-4 w-4" />
+                <SlidersHorizontal className="h-4 w-4 shrink-0" />
+                <span className="hidden sm:inline">Filter</span>
+                {activeFilterCount > 0 && (
+                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-fill px-1.5 text-[11px] font-extrabold text-white">
+                    {activeFilterCount}
+                  </span>
+                )}
               </button>
+            </div>
+
+            {showFilters && (
+              <Card className="flex flex-col gap-3 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-xs font-extrabold uppercase tracking-wider text-text-muted">
+                    Filter &amp; Sort
+                  </span>
+                  {activeFilterCount > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        sound.playClick();
+                        setTypeFilter("all");
+                        setStatusFilter("all");
+                        setSortBy("newest");
+                      }}
+                      className="text-xs font-extrabold text-brand-text hover:underline"
+                    >
+                      Reset filters
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-2.5">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="mr-1 text-xs font-extrabold text-text-faint">
+                      Type:
+                    </span>
+                    {(
+                      [
+                        ["all", "All"],
+                        ["multiple_choice", "Multiple Choice"],
+                        ["identification", "Identification"],
+                        ["enumeration", "Enumeration"],
+                      ] as const
+                    ).map(([value, label]) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => {
+                          sound.playClick();
+                          setTypeFilter(value);
+                        }}
+                        className={`focus-ring rounded-xl border-2 px-2.5 py-1 text-xs font-extrabold transition-colors ${
+                          typeFilter === value
+                            ? "border-brand-fill bg-brand-tint text-brand-text"
+                            : "border-border bg-surface text-text-muted hover:border-border-strong hover:text-text"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="mr-1 text-xs font-extrabold text-text-faint">
+                      Status:
+                    </span>
+                    {(
+                      [
+                        ["all", "All"],
+                        ["unplayed", "Unplayed"],
+                        ["played", "Played"],
+                      ] as const
+                    ).map(([value, label]) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => {
+                          sound.playClick();
+                          setStatusFilter(value);
+                        }}
+                        className={`focus-ring rounded-xl border-2 px-2.5 py-1 text-xs font-extrabold transition-colors ${
+                          statusFilter === value
+                            ? "border-brand-fill bg-brand-tint text-brand-text"
+                            : "border-border bg-surface text-text-muted hover:border-border-strong hover:text-text"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="mr-1 text-xs font-extrabold text-text-faint">
+                      Sort:
+                    </span>
+                    {(
+                      [
+                        ["newest", "Newest"],
+                        ["title", "Title (A–Z)"],
+                        ["questions", "Most Questions"],
+                        ["best", "Best Score"],
+                      ] as const
+                    ).map(([value, label]) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => {
+                          sound.playClick();
+                          setSortBy(value);
+                        }}
+                        className={`focus-ring rounded-xl border-2 px-2.5 py-1 text-xs font-extrabold transition-colors ${
+                          sortBy === value
+                            ? "border-brand-fill bg-brand-tint text-brand-text"
+                            : "border-border bg-surface text-text-muted hover:border-border-strong hover:text-text"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </Card>
             )}
           </div>
 
           {filteredQuizSets.length === 0 ? (
             <Card className="py-10 text-center flex flex-col items-center gap-3">
               <p className="text-lg font-extrabold text-text">
-                No quizzes match &ldquo;{search}&rdquo;
+                {search.trim()
+                  ? `No quizzes match "${search}"`
+                  : "No quizzes match the selected filters"}
               </p>
-              <Button variant="secondary" onClick={() => setSearch("")}>
-                Clear Search
+              <Button variant="secondary" onClick={resetSearchAndFilters}>
+                {activeFilterCount > 0 ? "Reset Search & Filters" : "Clear Search"}
               </Button>
             </Card>
           ) : (
