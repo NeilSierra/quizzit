@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, MotionConfig } from "framer-motion";
 import {
   BookOpen,
+  CheckCircle2,
   HelpCircle,
   History,
   Home,
@@ -13,6 +14,7 @@ import {
   Moon,
   PanelLeftClose,
   PanelLeftOpen,
+  RefreshCw,
   Settings,
   Sun,
   Upload,
@@ -47,6 +49,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const checkSavedSession = useQuizSession((s) => s.checkSavedSession);
   const initAuth = useAuth((s) => s.initAuth);
   const user = useAuth((s) => s.user);
+  const syncing = useAuth((s) => s.syncing);
   const pendingSyncCount = useAuth((s) => s.pendingSyncCount);
   const syncOfflineQueue = useAuth((s) => s.syncOfflineQueue);
   const openAuthModal = useAuth((s) => s.openAuthModal);
@@ -54,6 +57,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [showPatchNotes, setShowPatchNotes] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isOffline, setIsOffline] = useState(false);
+  const [offlineReady, setOfflineReady] = useState(false);
 
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -81,6 +85,9 @@ export function AppShell({ children }: { children: ReactNode }) {
     checkSavedSession();
     if (typeof window !== "undefined" && "serviceWorker" in navigator) {
       navigator.serviceWorker.register("/sw.js").catch(() => {});
+      navigator.serviceWorker.ready
+        .then(() => setOfflineReady(true))
+        .catch(() => {});
     }
     try {
       if (localStorage.getItem("quizapp:sidebar-collapsed") === "true") {
@@ -288,6 +295,13 @@ export function AppShell({ children }: { children: ReactNode }) {
             </span>
           </button>
 
+          {!collapsed && offlineReady && (
+            <div className="flex items-center justify-center gap-1.5 rounded-xl bg-success-bg/70 px-2.5 py-1.5 text-[11px] font-extrabold text-success">
+              <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+              <span>Offline Ready</span>
+            </div>
+          )}
+
           {!collapsed && (
             <Link
               href="/settings#about-creator"
@@ -432,7 +446,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* Main Content */}
       <main className="flex-1 min-w-0 pb-24 md:pb-12 px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="mx-auto max-w-[860px]">
-          {isOffline && (
+          {isOffline ? (
             <div
               role="status"
               className="mb-4 flex items-center gap-2.5 rounded-2xl border-2 border-warning/50 bg-warning/10 px-4 py-2.5 text-xs sm:text-sm font-extrabold text-warning"
@@ -446,6 +460,36 @@ export function AppShell({ children }: { children: ReactNode }) {
                 .
               </span>
             </div>
+          ) : (
+            user &&
+            pendingSyncCount > 0 && (
+              <div
+                role="status"
+                className="mb-4 flex flex-wrap items-center justify-between gap-2.5 rounded-2xl border-2 border-brand-fill/40 bg-brand-tint px-4 py-2.5 text-xs sm:text-sm font-extrabold text-brand-text"
+              >
+                <span>
+                  {pendingSyncCount}{" "}
+                  {pendingSyncCount === 1
+                    ? "offline change"
+                    : "offline changes"}{" "}
+                  pending cloud sync.
+                </span>
+                <button
+                  type="button"
+                  disabled={syncing}
+                  onClick={() => {
+                    sound.playClick();
+                    void syncOfflineQueue();
+                  }}
+                  className="focus-ring inline-flex items-center gap-1.5 rounded-xl border-2 border-brand-fill bg-surface px-3 py-1 text-xs font-extrabold text-brand-text hover:bg-brand-tint disabled:opacity-60"
+                >
+                  <RefreshCw
+                    className={`h-3.5 w-3.5 ${syncing ? "animate-spin" : ""}`}
+                  />
+                  <span>{syncing ? "Syncing..." : "Sync Now"}</span>
+                </button>
+              </div>
+            )
           )}
           {children}
         </div>

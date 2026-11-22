@@ -148,17 +148,57 @@ export const useAuth = create<AuthState>((set, get) => ({
       pendingSyncCount: getOfflineQueue().length,
     });
 
-    supabase.auth.getUser().then(({ data }) => {
-      const user = data.user ?? null;
-      set({ user, loading: false });
-      if (user) {
-        void syncUserFromCloud(user, set);
-      }
-    });
+    // Restore local session immediately so cold offline launches stay signed in
+    supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        const localUser = data.session?.user ?? null;
+        if (localUser) {
+          set({ user: localUser, loading: false });
+        }
+
+        if (typeof navigator !== "undefined" && !navigator.onLine) {
+          set({ loading: false });
+          return;
+        }
+
+        return supabase.auth
+          .getUser()
+          .then(({ data: userData, error }) => {
+            const verifiedUser = userData.user ?? null;
+            if (error && typeof navigator !== "undefined" && !navigator.onLine) {
+              set({ loading: false });
+              return;
+            }
+            set({ user: verifiedUser ?? localUser, loading: false });
+            const activeUser = verifiedUser ?? localUser;
+            if (activeUser) {
+              void syncUserFromCloud(activeUser, set);
+            }
+          })
+          .catch(() => {
+            set({ loading: false });
+          });
+      })
+      .catch(() => {
+        set({ loading: false });
+      });
 
     supabase.auth.onAuthStateChange((_event, session) => {
       const nextUser = session?.user ?? null;
       const prevUser = get().user;
+
+      // Never demote to guest while offline due to a failed token refresh
+      if (
+        !nextUser &&
+        prevUser &&
+        typeof navigator !== "undefined" &&
+        !navigator.onLine
+      ) {
+        set({ loading: false });
+        return;
+      }
+
       set({ user: nextUser, loading: false });
 
       if (nextUser && nextUser.id !== prevUser?.id) {

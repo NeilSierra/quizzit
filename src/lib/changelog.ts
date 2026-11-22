@@ -1,4 +1,4 @@
-export const APP_VERSION = "v3.5";
+export const APP_VERSION = "v3.6";
 
 export interface PatchNote {
   version: string;
@@ -8,6 +8,16 @@ export interface PatchNote {
 }
 
 export const PATCH_NOTES: PatchNote[] = [
+  {
+    version: "v3.6",
+    date: "2026-11-22",
+    title: "Full Offline-First PWA & Cold-Launch Support",
+    changes: [
+      "Upgraded the service worker to recursively precache all page JS/CSS bundles and Google Fonts on install, and fixed Next.js App Router offline navigation fallbacks.",
+      "Restored signed-in user sessions from local cache on cold offline launches so your cloud library remains accessible and offline edits always queue for auto-sync.",
+      "Added an Offline Ready indicator, a Sync Now button for pending changes, and an offline notice inside the Sign In modal.",
+    ],
+  },
   {
     version: "v3.5",
     date: "2026-11-22",

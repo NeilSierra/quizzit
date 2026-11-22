@@ -1,7 +1,18 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { Cloud, Download, ExternalLink, Lock, LogIn, LogOut, Trash2, Upload } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import {
+  CheckCircle2,
+  Cloud,
+  Download,
+  ExternalLink,
+  Lock,
+  LogIn,
+  LogOut,
+  RefreshCw,
+  Trash2,
+  Upload,
+} from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Modal } from "@/components/ui/Modal";
@@ -25,15 +36,36 @@ export default function SettingsPage() {
   const hydrated = useLibrary((s) => s.hydrated);
   const user = useAuth((s) => s.user);
   const syncing = useAuth((s) => s.syncing);
+  const pendingSyncCount = useAuth((s) => s.pendingSyncCount);
+  const syncOfflineQueue = useAuth((s) => s.syncOfflineQueue);
   const openAuthModal = useAuth((s) => s.openAuthModal);
   const signOut = useAuth((s) => s.signOut);
 
   const [confirmClear, setConfirmClear] = useState(false);
+  const [isOffline, setIsOffline] = useState(false);
+  const [offlineReady, setOfflineReady] = useState(false);
   const [backupNotice, setBackupNotice] = useState<{
     ok: boolean;
     message: string;
   } | null>(null);
   const backupInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const update = () => setIsOffline(!navigator.onLine);
+    update();
+    window.addEventListener("online", update);
+    window.addEventListener("offline", update);
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.ready
+        .then(() => setOfflineReady(true))
+        .catch(() => {});
+    }
+    return () => {
+      window.removeEventListener("online", update);
+      window.removeEventListener("offline", update);
+    };
+  }, []);
 
   const handleExportAll = () => {
     const json = storage.exportAllData();
@@ -101,30 +133,54 @@ export default function SettingsPage() {
               {user ? <Cloud className="h-6 w-6" /> : <Lock className="h-6 w-6" />}
             </div>
             <div>
-              <div className="font-extrabold text-text">
-                {user ? getUserDisplayName(user) : "Guest Mode (Local Only)"}
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-extrabold text-text">
+                  {user ? getUserDisplayName(user) : "Guest Mode (Local Only)"}
+                </span>
+                {offlineReady && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-success-bg px-2.5 py-0.5 text-[11px] font-extrabold text-success">
+                    <CheckCircle2 className="h-3 w-3 shrink-0" />
+                    Offline Ready
+                  </span>
+                )}
               </div>
               <div className="text-sm font-semibold text-text-muted">
                 {user
                   ? syncing
                     ? "Syncing your private library..."
-                    : "Synced to your private Supabase account. No shared library."
-                  : "Sign in to save your quizzes privately across devices."}
+                    : pendingSyncCount > 0
+                      ? `${pendingSyncCount} local ${pendingSyncCount === 1 ? "change" : "changes"} queued for cloud sync.`
+                      : "Synced to your private Supabase account. Works offline too."
+                  : "All quizzes & progress work offline on this device. Sign in to sync across devices."}
               </div>
             </div>
           </div>
 
-          {user ? (
-            <Button variant="secondary" onClick={() => void signOut()}>
-              <LogOut className="h-4 w-4" />
-              Sign Out
-            </Button>
-          ) : (
-            <Button variant="primary" onClick={openAuthModal}>
-              <LogIn className="h-4 w-4" />
-              Sign In
-            </Button>
-          )}
+          <div className="flex flex-wrap items-center gap-2">
+            {user && !isOffline && pendingSyncCount > 0 && (
+              <Button
+                variant="primary"
+                disabled={syncing}
+                onClick={() => void syncOfflineQueue()}
+              >
+                <RefreshCw
+                  className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`}
+                />
+                {syncing ? "Syncing..." : "Sync Now"}
+              </Button>
+            )}
+            {user ? (
+              <Button variant="secondary" onClick={() => void signOut()}>
+                <LogOut className="h-4 w-4" />
+                Sign Out
+              </Button>
+            ) : (
+              <Button variant="primary" onClick={openAuthModal}>
+                <LogIn className="h-4 w-4" />
+                Sign In
+              </Button>
+            )}
+          </div>
         </Card>
       </section>
 

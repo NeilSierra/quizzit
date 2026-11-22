@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
-import { KeyRound, Lock, LogIn, Mail, UserPlus } from "lucide-react";
+import { useEffect, useState, type FormEvent } from "react";
+import { KeyRound, Lock, LogIn, Mail, UserPlus, WifiOff } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
@@ -22,6 +22,19 @@ export function AuthModal() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  const [isOffline, setIsOffline] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const update = () => setIsOffline(!navigator.onLine);
+    update();
+    window.addEventListener("online", update);
+    window.addEventListener("offline", update);
+    return () => {
+      window.removeEventListener("online", update);
+      window.removeEventListener("offline", update);
+    };
+  }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -96,6 +109,19 @@ export function AuthModal() {
           </p>
         ) : (
           <>
+            {isOffline && (
+              <div
+                role="status"
+                className="flex items-center gap-2 rounded-xl border-2 border-warning/50 bg-warning/10 px-3 py-2 text-xs font-bold text-warning"
+              >
+                <WifiOff className="h-4 w-4 shrink-0" />
+                <span>
+                  You&apos;re offline &mdash; signing in or creating an account
+                  requires an internet connection. Your local quizzes remain
+                  available.
+                </span>
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
@@ -181,7 +207,7 @@ export function AuthModal() {
                 type="submit"
                 variant="primary"
                 fullWidth
-                disabled={submitting}
+                disabled={submitting || isOffline}
               >
                 {submitting ? (
                   "Please wait..."
@@ -207,7 +233,12 @@ export function AuthModal() {
               <div className="flex-grow border-t-2 border-border" />
             </div>
 
-            <Button variant="secondary" fullWidth onClick={handleGoogle}>
+            <Button
+              variant="secondary"
+              fullWidth
+              disabled={isOffline}
+              onClick={handleGoogle}
+            >
               <svg
                 className="h-[18px] w-[18px] shrink-0"
                 viewBox="0 0 24 24"

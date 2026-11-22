@@ -232,4 +232,24 @@ describe("compactOfflineQueue", () => {
     expect(q[0].type).toBe("upsert_badges");
     expect(q[1]).toEqual({ type: "delete_quiz", id: "q1" });
   });
+
+  it("collapses all prior mutations when clear_all is queued", () => {
+    const qs = parseJsonImport(JSON_TEMPLATE).validQuestions;
+    let q = compactOfflineQueue([], {
+      type: "upsert_quiz",
+      quizSet: { id: "q1", title: "Bio", createdAt: 1, questions: qs },
+    });
+    q = compactOfflineQueue(q, { type: "upsert_badges", unlockedBadges: ["first_quiz"] });
+    q = compactOfflineQueue(q, { type: "clear_all" });
+
+    expect(q).toEqual([{ type: "clear_all" }]);
+
+    q = compactOfflineQueue(q, {
+      type: "upsert_quiz",
+      quizSet: { id: "q2", title: "New", createdAt: 2, questions: qs },
+    });
+    expect(q).toHaveLength(2);
+    expect(q[0]).toEqual({ type: "clear_all" });
+    expect(q[1].type).toBe("upsert_quiz");
+  });
 });
