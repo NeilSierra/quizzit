@@ -3,6 +3,7 @@ import { convertQuestionsToMode } from "../convert";
 import { isTypoMatch, normalize } from "../normalize";
 import { CSV_TEMPLATE, parseCsvImport } from "../parsers/csv";
 import { JSON_TEMPLATE, parseJsonImport } from "../parsers/json";
+import { compactOfflineQueue } from "../offlineQueue";
 import { getQuizProgress } from "../progress";
 import { computeGuestMergeDiff } from "../supabase/sync";
 import {
@@ -213,5 +214,22 @@ describe("getQuizProgress (redemption & unquizzed)", () => {
     expect(p2.masteredCount).toBe(2);
     expect(p2.redemption).toHaveLength(0);
     expect(p2.unquizzed.map((q) => q.id)).toEqual([qs[2].id]);
+  });
+});
+
+describe("compactOfflineQueue", () => {
+  it("drops obsolete upserts/renames when a quiz is deleted", () => {
+    const qs = parseJsonImport(JSON_TEMPLATE).validQuestions;
+    let q = compactOfflineQueue([], {
+      type: "upsert_quiz",
+      quizSet: { id: "q1", title: "Bio", createdAt: 1, questions: qs },
+    });
+    q = compactOfflineQueue(q, { type: "rename_quiz", id: "q1", title: "Bio 2" });
+    q = compactOfflineQueue(q, { type: "upsert_badges", unlockedBadges: ["first_quiz"] });
+    q = compactOfflineQueue(q, { type: "delete_quiz", id: "q1" });
+
+    expect(q).toHaveLength(2);
+    expect(q[0].type).toBe("upsert_badges");
+    expect(q[1]).toEqual({ type: "delete_quiz", id: "q1" });
   });
 });

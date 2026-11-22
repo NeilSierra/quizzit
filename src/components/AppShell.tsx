@@ -47,6 +47,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const checkSavedSession = useQuizSession((s) => s.checkSavedSession);
   const initAuth = useAuth((s) => s.initAuth);
   const user = useAuth((s) => s.user);
+  const pendingSyncCount = useAuth((s) => s.pendingSyncCount);
+  const syncOfflineQueue = useAuth((s) => s.syncOfflineQueue);
   const openAuthModal = useAuth((s) => s.openAuthModal);
   const [collapsed, setCollapsed] = useState(false);
   const [showPatchNotes, setShowPatchNotes] = useState(false);
@@ -59,15 +61,19 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const syncOnline = () => setIsOffline(!navigator.onLine);
-    syncOnline();
-    window.addEventListener("online", syncOnline);
-    window.addEventListener("offline", syncOnline);
-    return () => {
-      window.removeEventListener("online", syncOnline);
-      window.removeEventListener("offline", syncOnline);
+    const handleOnline = () => {
+      setIsOffline(false);
+      void syncOfflineQueue();
     };
-  }, []);
+    const handleOffline = () => setIsOffline(true);
+    setIsOffline(!navigator.onLine);
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, [syncOfflineQueue]);
 
   useEffect(() => {
     hydrate();
@@ -423,8 +429,11 @@ export function AppShell({ children }: { children: ReactNode }) {
             >
               <WifiOff className="h-4 w-4 shrink-0" />
               <span>
-                Offline mode &mdash; your cached quizzes and progress are still
-                available locally.
+                Offline mode &mdash; quizzes and changes are saved locally
+                {pendingSyncCount > 0
+                  ? ` (${pendingSyncCount} pending sync)`
+                  : ""}
+                .
               </span>
             </div>
           )}

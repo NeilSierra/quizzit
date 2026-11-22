@@ -1,4 +1,4 @@
-export const APP_VERSION = "v3.1";
+export const APP_VERSION = "v3.2";
 
 export interface PatchNote {
   version: string;
@@ -8,6 +8,16 @@ export interface PatchNote {
 }
 
 export const PATCH_NOTES: PatchNote[] = [
+  {
+    version: "v3.2",
+    date: "2026-11-22",
+    title: "Full Offline Mode & Auto-Sync Queue",
+    changes: [
+      "Added an offline mutation queue so quizzes imported, renamed, deleted, or completed offline automatically sync to Supabase when you reconnect.",
+      "Precached quiz play, setup, results, and review shells in the service worker so every quiz in your library is playable offline.",
+      "Updated the Offline Mode banner to show how many local changes are queued for sync.",
+    ],
+  },
   {
     version: "v3.1",
     date: "2026-11-22",

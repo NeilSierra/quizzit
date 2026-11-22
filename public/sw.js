@@ -1,4 +1,4 @@
-const CACHE_NAME = "quizzit-pwa-v3-1";
+const CACHE_NAME = "quizzit-pwa-v3-2";
 const PRECACHE_URLS = [
   "/",
   "/library",
@@ -6,6 +6,10 @@ const PRECACHE_URLS = [
   "/history",
   "/settings",
   "/help",
+  "/quiz/offline/setup",
+  "/quiz/offline/play",
+  "/quiz/offline/results",
+  "/quiz/offline/review",
   "/icon.png",
   "/manifest.webmanifest",
   "/mascot/logo.png",
@@ -13,6 +17,14 @@ const PRECACHE_URLS = [
   "/mascot/thumbs-up.png",
   "/mascot/sad.png",
 ];
+
+function getQuizFallbackUrl(pathname) {
+  const match = pathname.match(/^\/quiz\/[^/]+\/(setup|play|results|review)$/);
+  if (match) {
+    return `/quiz/offline/${match[1]}`;
+  }
+  return "/";
+}
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -62,9 +74,13 @@ self.addEventListener("fetch", (event) => {
           return res;
         })
         .catch(() =>
-          caches
-            .match(request)
-            .then((m) => m || caches.match("/") || Response.error())
+          caches.match(request).then((m) => {
+            if (m) return m;
+            const fallback = getQuizFallbackUrl(url.pathname);
+            return caches
+              .match(fallback)
+              .then((fb) => fb || caches.match("/") || Response.error());
+          })
         )
     );
     return;

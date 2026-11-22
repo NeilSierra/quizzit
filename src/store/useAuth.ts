@@ -4,6 +4,10 @@ import { create } from "zustand";
 import type { User } from "@supabase/supabase-js";
 import { storage } from "@/lib/storage";
 import {
+  flushOfflineQueue,
+  getOfflineQueue,
+} from "@/lib/offlineQueue";
+import {
   createSupabaseBrowserClient,
   isSupabaseConfigured,
 } from "@/lib/supabase/client";
@@ -32,8 +36,11 @@ interface AuthState {
   initialized: boolean;
   authModalOpen: boolean;
   pendingGuestMerge: boolean;
+  pendingSyncCount: number;
 
   initAuth: () => void;
+  refreshPendingSync: () => void;
+  syncOfflineQueue: () => Promise<void>;
   openAuthModal: () => void;
   closeAuthModal: () => void;
   signInWithEmail: (
@@ -56,6 +63,9 @@ async function syncUserFromCloud(user: User, set: (s: Partial<AuthState>) => voi
 
   set({ syncing: true });
   try {
+    await flushOfflineQueue(supabase, user.id);
+    set({ pendingSyncCount: getOfflineQueue().length });
+
     const cloud = await fetchUserData(supabase, user.id);
     useLibrary
       .getState()
@@ -89,6 +99,33 @@ export const useAuth = create<AuthState>((set, get) => ({
   initialized: false,
   authModalOpen: false,
   pendingGuestMerge: false,
+  pendingSyncCount: 0,
+
+  refreshPendingSync: () => {
+    set({ pendingSyncCount: getOfflineQueue().length });
+  },
+
+  syncOfflineQueue: async () => {
+    const user = get().user;
+    const supabase = createSupabaseBrowserClient();
+    if (!user || !supabase) return;
+    if (typeof navigator !== "undefined" && !navigator.onLine) return;
+
+    set({ syncing: true });
+    try {
+      await flushOfflineQueue(supabase, user.id);
+      const remaining = getOfflineQueue().length;
+      set({ pendingSyncCount: remaining, syncing: false });
+      if (remaining === 0) {
+        const cloud = await fetchUserData(supabase, user.id);
+        useLibrary
+          .getState()
+          .setCloudData(cloud.quizSets, cloud.attempts, cloud.stats);
+      }
+    } catch {
+      set({ syncing: false, pendingSyncCount: getOfflineQueue().length });
+    }
+  },
 
   initAuth: () => {
     if (get().initialized) return;
@@ -105,7 +142,11 @@ export const useAuth = create<AuthState>((set, get) => ({
       return;
     }
 
-    set({ configured: true, initialized: true });
+    set({
+      configured: true,
+      initialized: true,
+      pendingSyncCount: getOfflineQueue().length,
+    });
 
     supabase.auth.getUser().then(({ data }) => {
       const user = data.user ?? null;
