@@ -109,7 +109,7 @@ export default function LibraryPage() {
             </h2>
             <p className="mt-1 text-sm font-semibold text-text-muted">
               Import a JSON or CSV question file to get started, or load our
-              sample Biology quiz to try it out right now.
+              easy sample quiz to try it out right now.
             </p>
           </div>
           <div className="flex flex-wrap justify-center gap-3 pt-2">

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Modal } from "@/components/ui/Modal";
 import { Toggle } from "@/components/ui/Toggle";
-import { APP_VERSION, PATCH_NOTES } from "@/lib/changelog";
+import { APP_VERSION } from "@/lib/changelog";
 import { sound } from "@/lib/sound";
 import { storage } from "@/lib/storage";
 import type { ThemePreference, UiScale } from "@/lib/types";
@@ -29,7 +29,6 @@ export default function SettingsPage() {
   const signOut = useAuth((s) => s.signOut);
 
   const [confirmClear, setConfirmClear] = useState(false);
-  const [showAllNotes, setShowAllNotes] = useState(false);
   const [backupNotice, setBackupNotice] = useState<{
     ok: boolean;
     message: string;
@@ -270,46 +269,6 @@ export default function SettingsPage() {
             </div>
           )}
         </Card>
-      </section>
-
-      {/* Patch Notes */}
-      <section className="flex flex-col gap-3">
-        <h2 className="text-2xl font-extrabold text-text">Patch Notes</h2>
-        <div className="flex flex-col gap-3">
-          {(showAllNotes ? PATCH_NOTES : PATCH_NOTES.slice(0, 3)).map((note) => (
-            <Card key={note.version} className="flex flex-col gap-2.5">
-              <div className="flex flex-col gap-2.5">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="shrink-0 rounded-full bg-brand-tint px-2.5 py-0.5 text-xs font-extrabold text-brand-text">
-                    {note.version}
-                  </span>
-                  <span className="shrink-0 text-xs font-bold text-text-faint">
-                    {note.date}
-                  </span>
-                </div>
-                <h3 className="text-base font-extrabold text-text leading-snug">
-                  {note.title}
-                </h3>
-              </div>
-              <ul className="list-disc pl-5 space-y-1 text-sm font-semibold text-text-muted">
-                {note.changes.map((c, idx) => (
-                  <li key={idx}>{c}</li>
-                ))}
-              </ul>
-            </Card>
-          ))}
-        </div>
-        {PATCH_NOTES.length > 3 && (
-          <Button
-            variant="secondary"
-            onClick={() => setShowAllNotes((v) => !v)}
-            className="self-start"
-          >
-            {showAllNotes
-              ? "Show Less"
-              : `Show Older (${PATCH_NOTES.length - 3})`}
-          </Button>
-        )}
       </section>
 
       {/* About the Creator */}
