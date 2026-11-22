@@ -1,4 +1,4 @@
-export const APP_VERSION = "v3.7";
+export const APP_VERSION = "v4.0";
 
 export interface PatchNote {
   version: string;
@@ -9,7 +9,7 @@ export interface PatchNote {
 
 export const PATCH_NOTES: PatchNote[] = [
   {
-    version: "v3.7",
+    version: "v4.0",
     date: "2026-11-22",
     title: "Visual Hierarchy & #C3871C Accent System",
     changes: [

@@ -1,4 +1,4 @@
-const CACHE_NAME = "quizzit-pwa-v3-7";
+const CACHE_NAME = "quizzit-pwa-v4-0";
 const PRECACHE_URLS = [
   "/",
   "/library",
